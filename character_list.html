@@ -246,6 +246,211 @@ svg {
 .boss .pants { fill: #322225; }
 .boss .accent { fill: #ffd166; }
 
+.view-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 250, 240, .92);
+  box-shadow: 0 8px 16px rgba(0,0,0,.12);
+}
+
+.view-toggle button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  padding: 5px 9px;
+  font-weight: 900;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.view-toggle button.active {
+  background: var(--line);
+  color: #fff;
+}
+
+.side-sprite {
+  display: none;
+  width: 190px;
+  height: 238px;
+  position: relative;
+  z-index: 1;
+  animation: side-bob .62s ease-in-out infinite;
+  transform-origin: 50% 92%;
+}
+
+.side-sprite.boss-side {
+  width: 226px;
+  height: 248px;
+  animation-duration: .82s;
+}
+
+.card[data-view="side"] .sprite {
+  display: none;
+}
+
+.card[data-view="side"] .side-sprite {
+  display: block;
+}
+
+.side-part {
+  position: absolute;
+  left: 50%;
+  border: 3px solid var(--line);
+  box-shadow: inset -10px -8px 0 rgba(0,0,0,.14);
+}
+
+.side-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  width: 112px;
+  height: 18px;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.18);
+  border-radius: 50%;
+  animation: shadow .62s ease-in-out infinite;
+}
+
+.side-head {
+  top: 22px;
+  width: 50px;
+  height: 54px;
+  margin-left: -18px;
+  border-radius: 18px 26px 20px 16px;
+  background: var(--skin);
+}
+
+.side-head::before {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 25px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #111;
+}
+
+.side-nose {
+  top: 48px;
+  width: 11px;
+  height: 9px;
+  margin-left: 25px;
+  border-radius: 50%;
+  background: var(--skin);
+}
+
+.side-hair {
+  top: 15px;
+  width: 58px;
+  height: 20px;
+  margin-left: -25px;
+  border-radius: 50% 50% 8px 8px;
+  background: var(--accent);
+}
+
+.side-body {
+  top: 78px;
+  width: 64px;
+  height: 100px;
+  margin-left: -31px;
+  border-radius: 28px 20px 20px 28px;
+  background: var(--shirt);
+}
+
+.side-sprite.robot-side .side-head,
+.side-sprite.robot-side .side-body {
+  border-radius: 6px;
+}
+
+.side-sprite.boss-side .side-body {
+  width: 82px;
+  height: 126px;
+  margin-left: -40px;
+}
+
+.side-sprite.boss-side .side-head {
+  width: 58px;
+  height: 62px;
+  margin-left: -21px;
+}
+
+.side-arm,
+.side-leg {
+  width: 17px;
+  border-radius: 999px;
+  transform-origin: 50% 10%;
+}
+
+.side-arm {
+  top: 94px;
+  height: 82px;
+  margin-left: 22px;
+  background: var(--skin);
+  animation: side-arm .62s ease-in-out infinite;
+}
+
+.side-leg {
+  top: 165px;
+  height: 72px;
+  background: var(--pants);
+}
+
+.side-leg.front {
+  margin-left: 4px;
+  animation: side-front-leg .62s ease-in-out infinite;
+}
+
+.side-leg.back {
+  margin-left: -25px;
+  opacity: .9;
+  animation: side-back-leg .62s ease-in-out infinite;
+}
+
+.side-tool {
+  top: 132px;
+  width: 8px;
+  height: 58px;
+  margin-left: 40px;
+  border-radius: 5px;
+  background: var(--tool);
+  animation: side-tool .62s ease-in-out infinite;
+}
+
+@keyframes side-bob {
+  0%, 100% { transform: translateY(0) translateX(-3px); }
+  50% { transform: translateY(-8px) translateX(3px); }
+}
+
+@keyframes side-arm {
+  0%, 100% { transform: rotate(-24deg); }
+  50% { transform: rotate(22deg); }
+}
+
+@keyframes side-front-leg {
+  0%, 100% { transform: rotate(22deg); }
+  50% { transform: rotate(-18deg); }
+}
+
+@keyframes side-back-leg {
+  0%, 100% { transform: rotate(-18deg); }
+  50% { transform: rotate(22deg); }
+}
+
+@keyframes side-tool {
+  0%, 100% { transform: rotate(-16deg); }
+  50% { transform: rotate(10deg); }
+}
+
 @keyframes bob {
   0%, 100% { transform: translateY(0) rotate(-1deg); }
   50% { transform: translateY(-9px) rotate(1deg); }
@@ -449,5 +654,101 @@ svg {
     </article>
   </main>
 </div>
+<script>
+const sideModelConfig = {
+  marc: {
+    skin: "#efc49b",
+    shirt: "#2f8f72",
+    pants: "#385b93",
+    accent: "#f1c64f",
+    tool: "#7a5434"
+  },
+  davide: {
+    skin: "#d89b71",
+    shirt: "#1e4d7a",
+    pants: "#2b2b31",
+    accent: "#c8d7e8",
+    tool: "#dfe7ef"
+  },
+  julie: {
+    skin: "#8792a2",
+    shirt: "#a7b0bd",
+    pants: "#59606c",
+    accent: "#72d8ff",
+    tool: "#72d8ff",
+    robot: true
+  },
+  olivier: {
+    skin: "#c78962",
+    shirt: "#7b2c28",
+    pants: "#3c2a23",
+    accent: "#f0a23a",
+    tool: "#7d4b30"
+  },
+  zombie: {
+    skin: "#8db579",
+    shirt: "#556b46",
+    pants: "#3f4b39",
+    accent: "#b44a4a",
+    tool: "#b44a4a"
+  },
+  boss: {
+    skin: "#6d211c",
+    shirt: "#e44d26",
+    pants: "#322225",
+    accent: "#ffd166",
+    tool: "#ffd166",
+    boss: true
+  }
+};
+
+function buildSideSprite(config) {
+  const side = document.createElement("div");
+  side.className = "side-sprite";
+  if (config.robot) side.classList.add("robot-side");
+  if (config.boss) side.classList.add("boss-side");
+  side.style.setProperty("--skin", config.skin);
+  side.style.setProperty("--shirt", config.shirt);
+  side.style.setProperty("--pants", config.pants);
+  side.style.setProperty("--accent", config.accent);
+  side.style.setProperty("--tool", config.tool);
+  side.innerHTML = [
+    '<span class="side-shadow"></span>',
+    '<span class="side-part side-leg back"></span>',
+    '<span class="side-part side-leg front"></span>',
+    '<span class="side-part side-body"></span>',
+    '<span class="side-part side-arm"></span>',
+    '<span class="side-part side-head"></span>',
+    '<span class="side-part side-nose"></span>',
+    '<span class="side-part side-hair"></span>',
+    '<span class="side-part side-tool"></span>'
+  ].join("");
+  return side;
+}
+
+document.querySelectorAll(".card").forEach(card => {
+  const sprite = card.querySelector(".sprite");
+  const stage = card.querySelector(".stage");
+  if (!sprite || !stage) return;
+
+  const type = Array.from(sprite.classList).find(name => sideModelConfig[name]);
+  if (!type) return;
+
+  card.dataset.view = "front";
+  const toggle = document.createElement("div");
+  toggle.className = "view-toggle";
+  toggle.innerHTML = '<button type="button" class="active" data-view="front">正面</button><button type="button" data-view="side">侧面</button>';
+  stage.appendChild(toggle);
+  stage.appendChild(buildSideSprite(sideModelConfig[type]));
+
+  toggle.addEventListener("click", event => {
+    const button = event.target.closest("button[data-view]");
+    if (!button) return;
+    const nextView = button.dataset.view;
+    card.dataset.view = nextView;
+    toggle.querySelectorAll("button").forEach(item => item.classList.toggle("active", item === button));
+  });
+});
+</script>
 </body>
 </html>
