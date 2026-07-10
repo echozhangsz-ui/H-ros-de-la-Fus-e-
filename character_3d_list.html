@@ -3,109 +3,303 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>3D Character List | Rocket Boss Game</title>
+<title>3D Character Cards | Rocket Boss Game</title>
 <style>
 :root {
   --ink: #171717;
-  --panel: rgba(255, 252, 244, .9);
+  --paper: #fffaf0;
   --line: #202020;
   --muted: #5d5a52;
-  --accent: #2f8f72;
-  --danger: #d14d35;
+  --bg1: #efe3c7;
+  --bg2: #cdb887;
+  --green: #2f8f72;
 }
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
   color: var(--ink);
   font-family: Arial, "Microsoft YaHei", sans-serif;
-  background: #d9caaa;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(47,143,114,.14), transparent 26%),
+    radial-gradient(circle at 88% 10%, rgba(230,107,61,.16), transparent 28%),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
 }
 
-#scene {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  display: block;
+body {
+  overflow-x: hidden;
 }
 
-.ui {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 22px;
+}
+
+header {
   display: grid;
-  grid-template-columns: minmax(180px, 260px) 1fr minmax(220px, 320px);
-  gap: 14px;
-  padding: 16px;
-}
-
-.panel {
-  pointer-events: auto;
-  align-self: start;
-  background: var(--panel);
-  border: 2px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 14px 38px rgba(23, 23, 23, .18);
-  backdrop-filter: blur(12px);
-}
-
-.left-panel {
-  padding: 10px;
-}
-
-.right-panel {
-  padding: 16px;
-  justify-self: end;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: end;
+  border-bottom: 3px solid var(--line);
+  padding-bottom: 18px;
 }
 
 h1 {
-  margin: 0 0 10px;
-  font-size: 20px;
-  line-height: 1.1;
+  margin: 0;
+  font-size: clamp(30px, 5vw, 54px);
+  line-height: 1;
 }
 
-h2 {
-  margin: 0 0 8px;
-  font-size: 26px;
-}
-
-.sub {
-  margin: 0 0 14px;
+.subtitle {
+  margin: 10px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  max-width: 720px;
+  font-size: 16px;
 }
 
-.character-tabs {
-  display: grid;
-  gap: 8px;
-}
-
-button {
+.badge {
   border: 2px solid var(--line);
   background: #fff;
-  color: var(--ink);
-  border-radius: 6px;
-  min-height: 38px;
-  padding: 8px 10px;
+  border-radius: 8px;
+  padding: 9px 12px;
   font-weight: 800;
-  cursor: pointer;
-  text-align: left;
+  white-space: nowrap;
 }
 
-button.active {
-  background: #17251f;
-  color: #fff;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.card {
+  background: rgba(255,250,240,.93);
+  border: 3px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(37, 29, 12, .17);
+}
+
+.viewer {
+  position: relative;
+  height: 360px;
+  border-bottom: 3px solid var(--line);
+  background: linear-gradient(180deg, #dacbab 0%, #c9b481 62%, #92764a 62%, #92764a 100%);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.viewer.dragging {
+  cursor: grabbing;
+}
+
+.viewer canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fallback-model {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: end center;
+  perspective: 760px;
+  padding-bottom: 46px;
+}
+
+.webgl-ready .fallback-model {
+  display: none;
+}
+
+.fallback-floor {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -8%;
+  height: 42%;
+  background:
+    repeating-linear-gradient(105deg, rgba(42,34,22,.55) 0 4px, transparent 4px 78px),
+    linear-gradient(180deg, #9a8054, #7c633d);
+  border-top: 3px solid rgba(32,32,32,.46);
+  transform: rotateX(58deg);
+  transform-origin: 50% 100%;
+}
+
+.css-character {
+  position: relative;
+  width: 118px;
+  height: 238px;
+  transform-style: preserve-3d;
+  animation: css-walk .72s ease-in-out infinite;
+}
+
+.css-character.boss-css {
+  width: 138px;
+  height: 284px;
+  animation-duration: .9s;
+}
+
+.css-part {
+  position: absolute;
+  left: 50%;
+  border: 2px solid rgba(20,18,16,.8);
+  box-shadow: inset -14px -10px 0 rgba(0,0,0,.16), 0 10px 18px rgba(0,0,0,.15);
+}
+
+.css-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 92px;
+  height: 22px;
+  transform: translateX(-50%) rotateX(78deg);
+  background: rgba(0,0,0,.28);
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+.css-head {
+  top: 20px;
+  width: 60px;
+  height: 54px;
+  margin-left: -30px;
+  border-radius: 18px;
+  background: var(--skin);
+  transform: translateZ(28px);
+}
+
+.robot-css .css-head {
+  border-radius: 5px;
+}
+
+.css-head::before,
+.css-head::after {
+  content: "";
+  position: absolute;
+  top: 25px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #101010;
+}
+
+.css-head::before { left: 17px; }
+.css-head::after { right: 17px; }
+
+.css-hair {
+  top: 13px;
+  width: 66px;
+  height: 22px;
+  margin-left: -33px;
+  border-radius: 50% 50% 12px 12px;
+  background: var(--hair);
+  transform: translateZ(34px);
+}
+
+.css-body {
+  top: 72px;
+  width: 72px;
+  height: 106px;
+  margin-left: -36px;
+  border-radius: 28px 28px 22px 22px;
+  background: var(--shirt);
+  transform: translateZ(18px);
+}
+
+.robot-css .css-body {
+  border-radius: 6px;
+}
+
+.boss-css .css-body {
+  width: 94px;
+  height: 136px;
+  margin-left: -47px;
+}
+
+.css-arm,
+.css-leg {
+  width: 18px;
+  border-radius: 999px;
+  background: var(--skin);
+  transform-origin: 50% 10%;
+}
+
+.css-arm {
+  top: 87px;
+  height: 84px;
+  animation: css-arm-left .72s ease-in-out infinite;
+}
+
+.css-arm.left { margin-left: -58px; }
+.css-arm.right {
+  margin-left: 40px;
+  animation-name: css-arm-right;
+}
+
+.css-leg {
+  top: 166px;
+  height: 74px;
+  background: var(--pants);
+  animation: css-leg-left .72s ease-in-out infinite;
+}
+
+.css-leg.left { margin-left: -32px; }
+.css-leg.right {
+  margin-left: 14px;
+  animation-name: css-leg-right;
+}
+
+.boss-css .css-arm,
+.boss-css .css-leg {
+  animation-duration: .9s;
+}
+
+.drag-hint {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 2;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,.9);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.meta {
+  padding: 14px;
+}
+
+.meta h2 {
+  margin: 0 0 7px;
+  font-size: 24px;
+}
+
+.role {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.desc {
+  margin: 0;
+  min-height: 48px;
 }
 
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin: 14px 0;
+  margin-top: 12px;
 }
 
 .stat {
@@ -121,229 +315,25 @@ button.active {
   font-size: 20px;
 }
 
-.controls {
-  pointer-events: auto;
-  align-self: end;
-  justify-self: center;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--panel);
-  border: 2px solid var(--line);
-  border-radius: 8px;
-  padding: 10px 12px;
-  box-shadow: 0 14px 38px rgba(23, 23, 23, .18);
-}
-
-.controls label {
-  font-size: 13px;
-  font-weight: 800;
-}
-
-input[type="range"] {
-  width: 180px;
-  accent-color: var(--accent);
-}
-
-.legend {
-  margin-top: 12px;
+.tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 7px;
+  margin-top: 12px;
 }
 
 .pill {
   border: 2px solid var(--line);
   border-radius: 999px;
   background: #fff;
-  padding: 5px 8px;
+  padding: 4px 8px;
   font-size: 12px;
   font-weight: 800;
 }
 
-.fallback-stage {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  perspective: 900px;
-  background: linear-gradient(180deg, #dacbac 0%, #c5ad80 58%, #8b7248 58%, #8b7248 100%);
-}
-
-.webgl-ready .fallback-stage {
-  display: none;
-}
-
-.fallback-floor {
-  position: absolute;
-  left: -8vw;
-  right: -8vw;
-  bottom: 0;
-  height: 35vh;
-  background:
-    repeating-linear-gradient(105deg, rgba(42,34,22,.52) 0 4px, transparent 4px 110px),
-    linear-gradient(180deg, #9a8054, #81663d);
-  border-top: 4px solid rgba(32, 32, 32, .45);
-  transform: rotateX(58deg);
-  transform-origin: 50% 100%;
-}
-
-.css-models {
-  position: relative;
-  z-index: 1;
-  width: min(940px, 82vw);
-  display: grid;
-  grid-template-columns: repeat(6, minmax(70px, 1fr));
-  gap: 22px;
-  align-items: end;
-  transform: translateY(70px) rotateX(6deg);
-}
-
-.css-character {
-  position: relative;
-  height: 230px;
-  transform-style: preserve-3d;
-  animation: css-step .72s ease-in-out infinite;
-}
-
-.css-character.boss-css {
-  height: 282px;
-  animation-duration: .9s;
-}
-
-.css-shadow {
-  position: absolute;
-  left: 50%;
-  bottom: 4px;
-  width: 86px;
-  height: 20px;
-  transform: translateX(-50%) rotateX(78deg);
-  background: rgba(0,0,0,.28);
-  border-radius: 50%;
-  filter: blur(1px);
-}
-
-.css-part {
-  position: absolute;
-  left: 50%;
-  transform-style: preserve-3d;
-  border: 2px solid rgba(20, 18, 16, .78);
-  box-shadow: inset -14px -10px 0 rgba(0,0,0,.16), 0 10px 18px rgba(0,0,0,.16);
-}
-
-.css-head {
-  top: 22px;
-  width: 58px;
-  height: 52px;
-  margin-left: -29px;
-  border-radius: 18px;
-  background: var(--skin);
-  transform: translateZ(30px);
-}
-
-.robot-css .css-head {
-  border-radius: 5px;
-}
-
-.css-head::before,
-.css-head::after {
-  content: "";
-  position: absolute;
-  top: 24px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #101010;
-}
-
-.css-head::before { left: 16px; }
-.css-head::after { right: 16px; }
-
-.css-hair {
-  top: 16px;
-  width: 64px;
-  height: 22px;
-  margin-left: -32px;
-  border-radius: 50% 50% 12px 12px;
-  background: var(--hair);
-  transform: translateZ(34px);
-}
-
-.css-body {
-  top: 72px;
-  width: 70px;
-  height: 104px;
-  margin-left: -35px;
-  border-radius: 28px 28px 22px 22px;
-  background: var(--shirt);
-  transform: translateZ(18px);
-}
-
-.robot-css .css-body {
-  border-radius: 6px;
-}
-
-.boss-css .css-body {
-  width: 90px;
-  height: 132px;
-  margin-left: -45px;
-}
-
-.css-arm,
-.css-leg {
-  width: 18px;
-  border-radius: 999px;
-  background: var(--skin);
-  transform-origin: 50% 10%;
-}
-
-.css-arm {
-  top: 86px;
-  height: 82px;
-  animation: css-arm-left .72s ease-in-out infinite;
-}
-
-.css-arm.left { margin-left: -56px; }
-.css-arm.right {
-  margin-left: 38px;
-  animation-name: css-arm-right;
-}
-
-.css-leg {
-  top: 164px;
-  height: 72px;
-  background: var(--pants);
-  animation: css-leg-left .72s ease-in-out infinite;
-}
-
-.css-leg.left { margin-left: -31px; }
-.css-leg.right {
-  margin-left: 13px;
-  animation-name: css-leg-right;
-}
-
-.boss-css .css-arm,
-.boss-css .css-leg {
-  animation-duration: .9s;
-}
-
-.css-name {
-  position: absolute;
-  left: 50%;
-  bottom: -18px;
-  transform: translateX(-50%);
-  background: rgba(255,255,255,.9);
-  border: 2px solid var(--line);
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 11px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-@keyframes css-step {
-  0%, 100% { transform: translateY(0) rotateY(-13deg); }
-  50% { transform: translateY(-10px) rotateY(13deg); }
+@keyframes css-walk {
+  0%, 100% { transform: translateY(0) rotateY(-14deg); }
+  50% { transform: translateY(-10px) rotateY(14deg); }
 }
 
 @keyframes css-arm-left {
@@ -366,100 +356,59 @@ input[type="range"] {
   50% { transform: rotateZ(-18deg) translateZ(12px); }
 }
 
-@media (max-width: 900px) {
-  .ui {
+@media (max-width: 980px) {
+  header {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-    padding: 10px;
   }
 
-  .left-panel {
-    display: none;
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 14px;
   }
 
-  .right-panel {
-    justify-self: stretch;
-    max-width: none;
+  .grid {
+    grid-template-columns: 1fr;
   }
 
-  .controls {
-    justify-self: stretch;
-  }
-
-  input[type="range"] {
-    width: 100%;
-  }
-
-  .css-models {
-    width: 106vw;
-    grid-template-columns: repeat(6, 115px);
-    gap: 10px;
-    transform: translate(-190px, 100px) rotateX(6deg);
-  }
-
-  .css-character {
-    height: 212px;
+  .viewer {
+    height: 330px;
   }
 }
 </style>
 </head>
 <body>
-<canvas id="scene" aria-label="3D character scene"></canvas>
-<div class="fallback-stage" aria-label="CSS 3D fallback character scene">
-  <div class="fallback-floor"></div>
-  <div class="css-models">
-    <div class="css-character" style="--skin:#efc49b;--shirt:#2f8f72;--pants:#385b93;--hair:#f1c64f">
-      <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span><span class="css-name">Marc</span>
+<div class="page">
+  <header>
+    <div>
+      <h1>3D Character Cards</h1>
+      <p class="subtitle">每个角色单独放在一个框里。拖动角色框可以旋转模型，看正面、侧面和背面。</p>
     </div>
-    <div class="css-character" style="--skin:#d89b71;--shirt:#1e4d7a;--pants:#2b2b31;--hair:#c8d7e8">
-      <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span><span class="css-name">Davide</span>
-    </div>
-    <div class="css-character robot-css" style="--skin:#8792a2;--shirt:#a7b0bd;--pants:#59606c;--hair:#72d8ff">
-      <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span><span class="css-name">Julie</span>
-    </div>
-    <div class="css-character" style="--skin:#c78962;--shirt:#7b2c28;--pants:#3c2a23;--hair:#f0a23a">
-      <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span><span class="css-name">Olivier</span>
-    </div>
-    <div class="css-character" style="--skin:#8db579;--shirt:#556b46;--pants:#3f4b39;--hair:#b44a4a">
-      <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span><span class="css-name">Zombie</span>
-    </div>
-    <div class="css-character boss-css" style="--skin:#6d211c;--shirt:#e44d26;--pants:#322225;--hair:#ffd166">
-      <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span><span class="css-name">Boss</span>
-    </div>
-  </div>
+    <div class="badge">6 characters · drag to rotate</div>
+  </header>
+
+  <main class="grid" id="grid"></main>
 </div>
 
-<div class="ui">
-  <aside class="panel left-panel">
-    <h1>3D Character List</h1>
-    <p class="sub">Rocket Boss Game</p>
-    <div class="character-tabs" id="characterTabs">
-      <button class="active" type="button">Marc</button>
-      <button type="button">Davide</button>
-      <button type="button">Julie Robot</button>
-      <button type="button">Olivier</button>
-      <button type="button">Zombie</button>
-      <button type="button">Boss</button>
+<template id="fallbackTemplate">
+  <div class="fallback-model">
+    <div class="fallback-floor"></div>
+    <div class="css-character">
+      <span class="css-shadow"></span>
+      <span class="css-part css-leg left"></span>
+      <span class="css-part css-leg right"></span>
+      <span class="css-part css-body"></span>
+      <span class="css-part css-arm left"></span>
+      <span class="css-part css-arm right"></span>
+      <span class="css-part css-head"></span>
+      <span class="css-part css-hair"></span>
     </div>
-  </aside>
-
-  <div class="controls">
-    <label for="speed">Walk Speed</label>
-    <input id="speed" type="range" min="0.4" max="1.8" step="0.1" value="1">
   </div>
-
-  <aside class="panel right-panel">
-    <h2 id="name">Marc</h2>
-    <p class="sub" id="role">Player · Explorer · Rocket builder</p>
-    <p id="desc">主角，负责探索普通世界、收集资源、制造火箭并进入 Boss 地图。</p>
-    <div class="stats">
-      <div class="stat"><strong id="pv">12</strong>PV</div>
-      <div class="stat"><strong id="atk">3+</strong>Attack</div>
-      <div class="stat"><strong id="speedStat">Medium</strong>Speed</div>
-    </div>
-    <div class="legend" id="tags"></div>
-  </aside>
-</div>
+</template>
 
 <script type="module">
 import * as THREE from "./three.module.js";
@@ -474,7 +423,6 @@ const characters = [
     atk: "3+",
     speed: "Medium",
     tags: ["Player", "Tool", "Rocket"],
-    x: -6.2,
     scale: 1,
     skin: 0xefc49b,
     shirt: 0x2f8f72,
@@ -491,7 +439,6 @@ const characters = [
     atk: "6+",
     speed: "Fast",
     tags: ["Enemy", "Sword", "Chase"],
-    x: -3.7,
     scale: 1.02,
     skin: 0xd89b71,
     shirt: 0x1e4d7a,
@@ -508,7 +455,6 @@ const characters = [
     atk: "4+",
     speed: "Steady",
     tags: ["Robot", "Guard", "Resource"],
-    x: -1.2,
     scale: 1,
     skin: 0x8792a2,
     shirt: 0xa7b0bd,
@@ -525,7 +471,6 @@ const characters = [
     atk: "7+",
     speed: "Quick",
     tags: ["Enemy", "Ambush", "Damage"],
-    x: 1.2,
     scale: 1.04,
     skin: 0xc78962,
     shirt: 0x7b2c28,
@@ -542,7 +487,6 @@ const characters = [
     atk: "5",
     speed: "Slow",
     tags: ["Enemy", "Patrol", "Slow"],
-    x: 3.7,
     scale: .98,
     skin: 0x8db579,
     shirt: 0x556b46,
@@ -559,8 +503,7 @@ const characters = [
     atk: "40",
     speed: "Heavy",
     tags: ["Boss", "Volcano", "Lava"],
-    x: 6.3,
-    scale: 1.34,
+    scale: 1.28,
     skin: 0x6d211c,
     shirt: 0xe44d26,
     pants: 0x322225,
@@ -569,258 +512,260 @@ const characters = [
   }
 ];
 
-const canvas = document.getElementById("scene");
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-document.body.classList.add("webgl-ready");
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const grid = document.getElementById("grid");
+const cards = [];
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xd9caaa);
-scene.fog = new THREE.Fog(0xd9caaa, 14, 34);
-
-const camera = new THREE.PerspectiveCamera(42, 1, .1, 80);
-camera.position.set(0, 4.8, 14.5);
-camera.lookAt(0, 1.2, 0);
-
-const hemi = new THREE.HemisphereLight(0xffffff, 0x8d6c42, 2.1);
-scene.add(hemi);
-
-const sun = new THREE.DirectionalLight(0xffffff, 2.2);
-sun.position.set(5, 9, 7);
-sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
-sun.shadow.camera.near = 1;
-sun.shadow.camera.far = 30;
-sun.shadow.camera.left = -12;
-sun.shadow.camera.right = 12;
-sun.shadow.camera.top = 10;
-sun.shadow.camera.bottom = -10;
-scene.add(sun);
-
-const groundMat = new THREE.MeshStandardMaterial({ color: 0x8c744b, roughness: .88, metalness: .05 });
-const ground = new THREE.Mesh(new THREE.BoxGeometry(21, .34, 8), groundMat);
-ground.position.y = -.2;
-ground.receiveShadow = true;
-scene.add(ground);
-
-const stripeMat = new THREE.MeshStandardMaterial({ color: 0x55462e, roughness: .9 });
-const stripes = [];
-for (let i = 0; i < 18; i++) {
-  const stripe = new THREE.Mesh(new THREE.BoxGeometry(.12, .03, 7.8), stripeMat);
-  stripe.position.set(-10.5 + i * 1.25, .01, 0);
-  stripe.receiveShadow = true;
-  stripes.push(stripe);
-  scene.add(stripe);
+function hex(color) {
+  return "#" + color.toString(16).padStart(6, "0");
 }
 
-const backMat = new THREE.MeshStandardMaterial({ color: 0xcbb78e, roughness: .9 });
-const backWall = new THREE.Mesh(new THREE.BoxGeometry(26, 7, .24), backMat);
-backWall.position.set(0, 3.05, -4.15);
-backWall.receiveShadow = true;
-scene.add(backWall);
+function createCard(config) {
+  const card = document.createElement("article");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="viewer" data-id="${config.id}">
+      <canvas aria-label="${config.name} 3D model"></canvas>
+      <div class="drag-hint">Drag to rotate</div>
+    </div>
+    <div class="meta">
+      <h2>${config.name}</h2>
+      <p class="role">${config.role}</p>
+      <p class="desc">${config.desc}</p>
+      <div class="stats">
+        <div class="stat"><strong>${config.pv}</strong>PV</div>
+        <div class="stat"><strong>${config.atk}</strong>Attack</div>
+        <div class="stat"><strong>${config.speed}</strong>Speed</div>
+      </div>
+      <div class="tags">${config.tags.map(tag => `<span class="pill">${tag}</span>`).join("")}</div>
+    </div>
+  `;
 
-function mat(color, roughness = .72, metalness = .02) {
+  const fallback = document.getElementById("fallbackTemplate").content.firstElementChild.cloneNode(true);
+  const cssCharacter = fallback.querySelector(".css-character");
+  cssCharacter.style.setProperty("--skin", hex(config.skin));
+  cssCharacter.style.setProperty("--shirt", hex(config.shirt));
+  cssCharacter.style.setProperty("--pants", hex(config.pants));
+  cssCharacter.style.setProperty("--hair", hex(config.hair));
+  if (config.robot) cssCharacter.classList.add("robot-css");
+  if (config.boss) cssCharacter.classList.add("boss-css");
+  card.querySelector(".viewer").appendChild(fallback);
+  grid.appendChild(card);
+  return card;
+}
+
+function material(color, roughness = .72, metalness = .02) {
   return new THREE.MeshStandardMaterial({ color, roughness, metalness });
 }
 
-function addPart(parent, geometry, material, position, scale = [1, 1, 1], cast = true) {
-  const mesh = new THREE.Mesh(geometry, material);
+function addPart(parent, geometry, mat, position, scale = [1, 1, 1], castShadow = true) {
+  const mesh = new THREE.Mesh(geometry, mat);
   mesh.position.set(position[0], position[1], position[2]);
   mesh.scale.set(scale[0], scale[1], scale[2]);
-  mesh.castShadow = cast;
+  mesh.castShadow = castShadow;
   mesh.receiveShadow = true;
   parent.add(mesh);
   return mesh;
 }
 
-function limb(parent, color, side, kind) {
+function addLimb(parent, config, side, kind) {
   const pivot = new THREE.Group();
-  const x = side === "left" ? -.43 : .43;
-  const y = kind === "arm" ? 1.72 : .74;
-  pivot.position.set(x, y, 0);
+  pivot.position.set(side === "left" ? -.43 : .43, kind === "arm" ? 1.7 : .72, 0);
   parent.add(pivot);
-
-  const length = kind === "arm" ? .86 : .98;
-  const radius = kind === "arm" ? .105 : .14;
-  const part = addPart(pivot, new THREE.CapsuleGeometry(radius, length, 8, 14), mat(color), [0, -length * .46, 0], [1, 1, 1]);
-  part.rotation.z = kind === "arm" ? (side === "left" ? .15 : -.15) : 0;
+  const length = kind === "arm" ? .82 : .94;
+  const radius = kind === "arm" ? .1 : .135;
+  const color = kind === "arm" ? config.skin : config.pants;
+  addPart(pivot, new THREE.CapsuleGeometry(radius, length, 8, 14), material(color), [0, -length * .46, 0]);
   return pivot;
 }
 
-function makeWeapon(parent, type) {
-  if (!type) return null;
+function addWeapon(parent, type) {
+  if (!type) return;
   const group = new THREE.Group();
-  group.position.set(.05, -.55, 0);
+  group.position.set(.04, -.56, .02);
   parent.add(group);
+
   if (type === "sword") {
-    addPart(group, new THREE.BoxGeometry(.07, 1.22, .07), mat(0xdfe7ef, .35, .5), [0, -.08, 0]);
-    addPart(group, new THREE.BoxGeometry(.34, .08, .08), mat(0x2b2b31), [0, .52, 0]);
+    addPart(group, new THREE.BoxGeometry(.06, 1.08, .06), material(0xdfe7ef, .35, .5), [0, -.05, 0]);
+    addPart(group, new THREE.BoxGeometry(.32, .07, .07), material(0x2b2b31), [0, .47, 0]);
   } else if (type === "pickaxe") {
-    addPart(group, new THREE.BoxGeometry(.07, 1.04, .07), mat(0x7a5434), [0, -.12, 0]);
-    addPart(group, new THREE.BoxGeometry(.62, .08, .08), mat(0xb8c0c8, .42, .35), [0, .38, 0]);
+    addPart(group, new THREE.BoxGeometry(.06, .96, .06), material(0x7a5434), [0, -.1, 0]);
+    addPart(group, new THREE.BoxGeometry(.58, .07, .07), material(0xb8c0c8, .42, .35), [0, .34, 0]);
   } else if (type === "club") {
-    addPart(group, new THREE.CapsuleGeometry(.12, .92, 8, 12), mat(0x5a3928), [0, -.1, 0]);
-    addPart(group, new THREE.SphereGeometry(.2, 16, 12), mat(0x7d4b30), [0, .38, 0]);
+    addPart(group, new THREE.CapsuleGeometry(.11, .82, 8, 12), material(0x5a3928), [0, -.08, 0]);
+    addPart(group, new THREE.SphereGeometry(.18, 16, 12), material(0x7d4b30), [0, .34, 0]);
   }
-  return group;
 }
 
-function buildCharacter(config) {
+function buildModel(config) {
   const root = new THREE.Group();
-  root.position.x = config.x;
   root.scale.setScalar(config.scale);
-  root.userData.config = config;
 
-  const bodyShape = config.robot
-    ? new THREE.BoxGeometry(.96, 1.24, .56)
-    : new THREE.CapsuleGeometry(.46, .96, 12, 20);
-  const body = addPart(root, bodyShape, mat(config.shirt, .68, config.robot ? .26 : .02), [0, 1.4, 0]);
-  if (!config.robot) body.scale.x = config.boss ? 1.25 : 1;
+  const bodyGeometry = config.robot
+    ? new THREE.BoxGeometry(.9, 1.18, .54)
+    : new THREE.CapsuleGeometry(.45, .94, 12, 20);
+  const body = addPart(root, bodyGeometry, material(config.shirt, .68, config.robot ? .26 : .02), [0, 1.38, 0]);
+  if (config.boss) body.scale.x = 1.18;
 
-  const headGeom = config.robot
-    ? new THREE.BoxGeometry(.72, .54, .58)
-    : new THREE.SphereGeometry(.38, 24, 18);
-  const head = addPart(root, headGeom, mat(config.skin, .62, config.robot ? .34 : .02), [0, 2.25, 0]);
+  const headGeometry = config.robot
+    ? new THREE.BoxGeometry(.7, .52, .56)
+    : new THREE.SphereGeometry(.37, 24, 18);
+  const head = addPart(root, headGeometry, material(config.skin, .62, config.robot ? .34 : .02), [0, 2.22, 0]);
 
   const hair = config.robot
-    ? addPart(root, new THREE.SphereGeometry(.08, 12, 10), mat(config.hair, .35, .45), [0, 2.62, 0])
-    : addPart(root, new THREE.SphereGeometry(.4, 24, 12, 0, Math.PI * 2, 0, Math.PI * .45), mat(config.hair), [0, 2.36, 0]);
+    ? addPart(root, new THREE.SphereGeometry(.08, 12, 10), material(config.hair, .35, .45), [0, 2.58, 0])
+    : addPart(root, new THREE.SphereGeometry(.39, 24, 12, 0, Math.PI * 2, 0, Math.PI * .45), material(config.hair), [0, 2.33, 0]);
   hair.scale.y = config.robot ? 1 : .42;
 
-  const eyeMat = mat(config.boss ? 0xffd166 : config.robot ? 0x72d8ff : 0x111111, .4, config.robot ? .5 : .02);
-  addPart(root, new THREE.SphereGeometry(.045, 10, 8), eyeMat, [-.13, 2.27, .36]);
-  addPart(root, new THREE.SphereGeometry(.045, 10, 8), eyeMat, [.13, 2.27, .36]);
+  const eyeMat = material(config.boss ? 0xffd166 : config.robot ? 0x72d8ff : 0x111111, .4, config.robot ? .5 : .02);
+  addPart(root, new THREE.SphereGeometry(.045, 10, 8), eyeMat, [-.13, 2.24, .35]);
+  addPart(root, new THREE.SphereGeometry(.045, 10, 8), eyeMat, [.13, 2.24, .35]);
 
   if (config.boss) {
-    addPart(root, new THREE.ConeGeometry(.14, .35, 4), mat(config.hair), [-.18, 2.72, 0]);
-    addPart(root, new THREE.ConeGeometry(.14, .35, 4), mat(config.hair), [.18, 2.72, 0]);
+    addPart(root, new THREE.ConeGeometry(.13, .34, 4), material(config.hair), [-.18, 2.68, 0]);
+    addPart(root, new THREE.ConeGeometry(.13, .34, 4), material(config.hair), [.18, 2.68, 0]);
   }
 
-  const leftArm = limb(root, config.skin, "left", "arm");
-  const rightArm = limb(root, config.skin, "right", "arm");
-  const leftLeg = limb(root, config.pants, "left", "leg");
-  const rightLeg = limb(root, config.pants, "right", "leg");
+  const leftArm = addLimb(root, config, "left", "arm");
+  const rightArm = addLimb(root, config, "right", "arm");
+  const leftLeg = addLimb(root, config, "left", "leg");
+  const rightLeg = addLimb(root, config, "right", "leg");
+  addWeapon(rightArm, config.weapon);
 
   let extraLeft = null;
   let extraRight = null;
   if (config.boss) {
-    extraLeft = limb(root, config.skin, "left", "arm");
-    extraRight = limb(root, config.skin, "right", "arm");
-    extraLeft.position.y = 1.43;
-    extraRight.position.y = 1.43;
-    extraLeft.position.x = -.58;
-    extraRight.position.x = .58;
+    extraLeft = addLimb(root, config, "left", "arm");
+    extraRight = addLimb(root, config, "right", "arm");
+    extraLeft.position.set(-.6, 1.42, 0);
+    extraRight.position.set(.6, 1.42, 0);
   }
 
-  const weapon = makeWeapon(rightArm, config.weapon);
-  if (weapon) weapon.rotation.z = config.weapon === "sword" ? -.45 : .35;
-
-  const namePlate = addPart(root, new THREE.BoxGeometry(1.35, .08, .12), mat(config.hair), [0, .08, .02], [1, 1, 1], false);
-  namePlate.userData.nonAnimated = true;
-
-  root.userData.parts = { body, head, leftArm, rightArm, leftLeg, rightLeg, extraLeft, extraRight };
-  scene.add(root);
-  return root;
+  return { root, parts: { body, head, leftArm, rightArm, leftLeg, rightLeg, extraLeft, extraRight }, config };
 }
 
-const models = characters.map(buildCharacter);
-let activeIndex = 0;
-let speedMultiplier = 1;
+function createScene(canvas, config) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
 
-const tabs = document.getElementById("characterTabs");
-const nameEl = document.getElementById("name");
-const roleEl = document.getElementById("role");
-const descEl = document.getElementById("desc");
-const pvEl = document.getElementById("pv");
-const atkEl = document.getElementById("atk");
-const speedEl = document.getElementById("speedStat");
-const tagsEl = document.getElementById("tags");
-tabs.innerHTML = "";
+  const scene = new THREE.Scene();
+  scene.background = null;
+  const camera = new THREE.PerspectiveCamera(38, 1, .1, 40);
+  camera.position.set(0, 2.6, 6.8);
+  camera.lookAt(0, 1.25, 0);
 
-function setActive(index) {
-  activeIndex = index;
-  const item = characters[index];
-  nameEl.textContent = item.name;
-  roleEl.textContent = item.role;
-  descEl.textContent = item.desc;
-  pvEl.textContent = item.pv;
-  atkEl.textContent = item.atk;
-  speedEl.textContent = item.speed;
-  tagsEl.innerHTML = item.tags.map(tag => `<span class="pill">${tag}</span>`).join("");
-  tabs.querySelectorAll("button").forEach((button, i) => button.classList.toggle("active", i === index));
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x80633d, 2.1));
+  const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+  sun.position.set(4, 6, 5);
+  sun.castShadow = true;
+  scene.add(sun);
+
+  const ground = new THREE.Mesh(
+    new THREE.BoxGeometry(4.8, .24, 4.1),
+    material(0x92764a, .88, .02)
+  );
+  ground.position.y = -.18;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  const model = buildModel(config);
+  model.root.position.y = .04;
+  scene.add(model.root);
+
+  return { renderer, scene, camera, model, rotation: config.boss ? -.15 : .15, targetRotation: config.boss ? -.15 : .15, dragging: false, lastX: 0 };
 }
 
-characters.forEach((item, index) => {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.textContent = item.name;
-  button.addEventListener("click", () => setActive(index));
-  tabs.appendChild(button);
-});
-setActive(0);
+characters.forEach(config => {
+  const card = createCard(config);
+  const viewer = card.querySelector(".viewer");
+  const canvas = card.querySelector("canvas");
+  let entry = null;
 
-document.getElementById("speed").addEventListener("input", event => {
-  speedMultiplier = Number(event.target.value);
-});
+  try {
+    entry = createScene(canvas, config);
+    viewer.classList.add("webgl-ready");
+  } catch (error) {
+    console.error(error);
+  }
 
-const clock = new THREE.Clock();
-const target = new THREE.Vector3();
-const cameraTarget = new THREE.Vector3(0, 1.25, 0);
+  const start = event => {
+    if (!entry) return;
+    viewer.classList.add("dragging");
+    entry.dragging = true;
+    entry.lastX = event.clientX;
+    viewer.setPointerCapture?.(event.pointerId);
+  };
+  const move = event => {
+    if (!entry || !entry.dragging) return;
+    const delta = event.clientX - entry.lastX;
+    entry.lastX = event.clientX;
+    entry.targetRotation += delta * .012;
+  };
+  const end = () => {
+    if (!entry) return;
+    viewer.classList.remove("dragging");
+    entry.dragging = false;
+  };
+
+  viewer.addEventListener("pointerdown", start);
+  viewer.addEventListener("pointermove", move);
+  viewer.addEventListener("pointerup", end);
+  viewer.addEventListener("pointercancel", end);
+  if (entry) cards.push({ viewer, entry });
+});
 
 function animateModel(model, elapsed) {
-  const config = model.userData.config;
-  const parts = model.userData.parts;
-  const phase = elapsed * (config.boss ? 3.2 : config.zombie ? 3.6 : 4.4) * speedMultiplier + config.x * .27;
+  const config = model.config;
+  const parts = model.parts;
+  const phase = elapsed * (config.boss ? 3.1 : config.zombie ? 3.5 : 4.3);
   const swing = Math.sin(phase);
   const counter = Math.cos(phase);
-  const weight = config.boss ? .52 : config.zombie ? .75 : 1;
+  const weight = config.boss ? .5 : config.zombie ? .72 : 1;
 
-  model.position.y = Math.abs(swing) * .09 * weight;
-  parts.body.rotation.z = swing * .035 * weight;
-  parts.head.rotation.z = -swing * .05 * weight;
+  model.root.position.y = .04 + Math.abs(swing) * .075 * weight;
+  parts.body.rotation.z = swing * .03 * weight;
+  parts.head.rotation.z = -swing * .045 * weight;
   parts.leftArm.rotation.x = swing * .7 * weight;
   parts.rightArm.rotation.x = -swing * .7 * weight;
   parts.leftLeg.rotation.x = -swing * .62 * weight;
   parts.rightLeg.rotation.x = swing * .62 * weight;
-  if (parts.extraLeft) parts.extraLeft.rotation.x = counter * .48;
-  if (parts.extraRight) parts.extraRight.rotation.x = -counter * .48;
+
+  if (parts.extraLeft) parts.extraLeft.rotation.x = counter * .45;
+  if (parts.extraRight) parts.extraRight.rotation.x = -counter * .45;
 
   if (config.zombie) {
-    parts.leftArm.rotation.x = -.95 + swing * .2;
-    parts.rightArm.rotation.x = -.95 - swing * .2;
-    parts.head.rotation.z = .12 * Math.sin(phase * .5);
+    parts.leftArm.rotation.x = -.92 + swing * .18;
+    parts.rightArm.rotation.x = -.92 - swing * .18;
   }
 }
 
-function resize() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  renderer.setSize(width, height, false);
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
+const clock = new THREE.Clock();
+
+function resizeRenderer(entry, viewer) {
+  const rect = viewer.getBoundingClientRect();
+  const width = Math.max(1, Math.floor(rect.width));
+  const height = Math.max(1, Math.floor(rect.height));
+  const canvas = entry.renderer.domElement;
+  if (canvas.width !== width || canvas.height !== height) {
+    entry.renderer.setSize(width, height, false);
+    entry.camera.aspect = width / height;
+    entry.camera.updateProjectionMatrix();
+  }
 }
-window.addEventListener("resize", resize);
-resize();
 
 function render() {
   const elapsed = clock.getElapsedTime();
-  models.forEach(model => animateModel(model, elapsed));
-
-  stripes.forEach((stripe, index) => {
-  stripe.position.x = -10.5 + ((index * 1.25 + elapsed * .9 * speedMultiplier) % 21);
-  });
-
-  const active = models[activeIndex];
-  target.set(active.position.x * .14, 1.4, 0);
-  cameraTarget.lerp(target, .035);
-  camera.position.x += (active.position.x * .06 - camera.position.x) * .035;
-  camera.lookAt(cameraTarget);
-
-  renderer.render(scene, camera);
+  for (const { viewer, entry } of cards) {
+    resizeRenderer(entry, viewer);
+    entry.rotation += (entry.targetRotation - entry.rotation) * .18;
+    if (!entry.dragging) entry.targetRotation += .0025;
+    entry.model.root.rotation.y = entry.rotation;
+    animateModel(entry.model, elapsed);
+    entry.renderer.render(entry.scene, entry.camera);
+  }
   requestAnimationFrame(render);
 }
+
 render();
 </script>
 </body>
