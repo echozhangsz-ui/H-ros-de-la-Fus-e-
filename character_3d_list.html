@@ -156,6 +156,44 @@ h1 {
   animation-duration: 1s;
 }
 
+.marc-css .part {
+  transform-style: preserve-3d;
+}
+
+.marc-css .head,
+.marc-css .body,
+.marc-css .arm,
+.marc-css .leg,
+.marc-css .hair {
+  transform: translateZ(18px);
+}
+
+.marc-css .part::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -20px;
+  width: 20px;
+  height: calc(100% + 4px);
+  border: 2px solid rgba(20, 18, 14, .7);
+  background: rgba(20, 18, 14, .2);
+  transform-origin: left center;
+  transform: rotateY(90deg);
+}
+
+.marc-css .part::after {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: 20px;
+  border: 2px solid rgba(20, 18, 14, .62);
+  background: rgba(255, 255, 255, .18);
+  transform-origin: bottom center;
+  transform: rotateX(90deg);
+}
+
 .part {
   position: absolute;
   left: 50%;
@@ -496,7 +534,7 @@ h1 {
 <script>
 (function () {
   window.characterData = [
-    { id: "marc", name: "Marc", cssClass: "", role: "Player · Explorer · Rocket builder", desc: "主角，绿色方块头、白色上衣和细长四肢，接近原设计图里的普通玩家形象。", pv: "12", atk: "3+", speed: "Medium", tags: ["Player", "Tool", "Rocket"], skin: 0x69a78b, shirt: 0xf4f0e5, pants: 0xcfd5de, hair: 0x202020, hand: 0x4a8b70, eyes: 0x101010, mouth: "flat", weapon: "pickaxe", scale: 1 },
+    { id: "marc", name: "Marc", cssClass: "marc-css", role: "Player · Explorer · Rocket builder", desc: "主角，绿色方块头、白色上衣和粗壮方块四肢，先按真正 3D 方块体比例测试。", pv: "12", atk: "3+", speed: "Medium", tags: ["Player", "Tool", "Rocket"], skin: 0x69a78b, shirt: 0xf4f0e5, pants: 0xcfd5de, hair: 0x202020, hand: 0x4a8b70, eyes: 0x101010, mouth: "flat", weapon: "pickaxe", scale: 1 },
     { id: "davide", name: "Davide", cssClass: "davide-css smile", role: "Enemy · Fast · Sword", desc: "快速近战敌人，绿色脸、黑色斜发和手持剑，保留原画里奔跑攻击的感觉。", pv: "8", atk: "6+", speed: "Fast", tags: ["Enemy", "Sword", "Chase"], skin: 0x78a889, shirt: 0xf0eee8, pants: 0xded8ce, hair: 0x191919, hand: 0x4a8b70, eyes: 0x1c2b6d, mouth: "smile", weapon: "sword", scale: 1.03, forwardLean: true },
     { id: "julie", name: "Julie Robot", cssClass: "robot-css smile", role: "Robot · Guard · Smooth", desc: "机器人角色，方形头和方块肩膀更宽，眼睛和关节带一点蓝色机械发光。", pv: "15", atk: "4+", speed: "Steady", tags: ["Robot", "Guard", "Resource"], skin: 0xc7cdd3, shirt: 0xb8c0c9, pants: 0xbfc5cc, hair: 0x7edbff, hand: 0x9da7b3, eyes: 0x213040, mouth: "smile", scale: 1, robot: true },
     { id: "olivier", name: "Olivier", cssClass: "teeth-css", role: "Enemy · Ambush · High damage", desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。", pv: "7", atk: "7+", speed: "Quick", tags: ["Enemy", "Ambush", "Damage"], skin: 0x82b48b, shirt: 0xf1eee5, pants: 0xe3ddd3, hair: 0x171717, hand: 0x4f9474, eyes: 0x101010, mouth: "teeth", weapon: "club", scale: 1.04, forwardLean: true },
@@ -630,7 +668,8 @@ function addFace(root, config, headY, headDepth) {
 
 function addHair(root, config, headY, headSize) {
   const topY = headY + headSize[1] / 2 + .04;
-  block(root, [headSize[0] + .06, .12, headSize[2] + .05], config.hair, [0, topY, 0]);
+  const hairDepth = config.id === "marc" ? headSize[2] + .12 : headSize[2] + .05;
+  block(root, [headSize[0] + .06, .12, hairDepth], config.hair, [0, topY, 0]);
   if (config.id === "davide") block(root, [.56, .22, .12], config.hair, [-.14, topY - .04, .18], { rotation: [0, 0, -.38] });
   if (config.id === "olivier" || config.boss) {
     for (let i = 0; i < 5; i++) {
@@ -642,7 +681,7 @@ function addHair(root, config, headY, headSize) {
 
 function makeLimb(root, config, side, type, y, length, thickness) {
   const pivot = new THREE.Group();
-  const shoulderSpread = config.boss ? .72 : config.robot && type === "arm" ? .68 : .61;
+  const shoulderSpread = config.boss ? .72 : config.id === "marc" && type === "arm" ? .67 : config.robot && type === "arm" ? .68 : .61;
   pivot.position.set(side === "left" ? -shoulderSpread : shoulderSpread, y, 0);
   root.add(pivot);
   block(pivot, [thickness, length, thickness], type === "arm" ? config.hand : config.pants, [0, -length / 2, 0]);
@@ -673,11 +712,12 @@ function addWeapon(handPivot, type, side = "right") {
 
 function buildBlockCharacter(config) {
   const root = new THREE.Group();
+  const isMarc = config.id === "marc";
   root.scale.setScalar(config.scale);
   root.rotation.z = config.forwardLean ? -.04 : 0;
 
-  const bodySize = config.boss ? [1.28, 1.08, .52] : config.robot ? [1.18, .92, .5] : [.88, .95, .48];
-  const headSize = config.boss ? [.72, .72, .58] : config.robot ? [.78, .66, .58] : [.68, .72, .58];
+  const bodySize = config.boss ? [1.28, 1.08, .52] : config.robot ? [1.18, .92, .5] : isMarc ? [.92, .96, .84] : [.88, .95, .48];
+  const headSize = config.boss ? [.72, .72, .58] : config.robot ? [.78, .66, .58] : isMarc ? [.72, .72, .72] : [.68, .72, .58];
   const bodyY = config.boss ? 1.35 : 1.27;
   const headY = config.boss ? 2.33 : 2.12;
 
@@ -699,14 +739,14 @@ function buildBlockCharacter(config) {
 
   const armLength = config.boss ? 1.02 : .92;
   const legLength = config.boss ? .86 : .82;
-  const armThickness = config.boss ? .34 : config.robot ? .31 : .3;
-  const legThickness = config.boss ? .36 : .32;
+  const armThickness = config.boss ? .34 : isMarc ? .38 : config.robot ? .31 : .3;
+  const legThickness = config.boss ? .36 : isMarc ? .38 : .32;
   const leftArm = makeLimb(root, config, "left", "arm", config.boss ? 1.72 : 1.65, armLength, armThickness);
   const rightArm = makeLimb(root, config, "right", "arm", config.boss ? 1.72 : 1.65, armLength, armThickness);
   const leftLeg = makeLimb(root, config, "left", "leg", .84, legLength, legThickness);
   const rightLeg = makeLimb(root, config, "right", "leg", .84, legLength, legThickness);
-  leftLeg.position.x = config.boss ? -.32 : -.24;
-  rightLeg.position.x = config.boss ? .32 : .24;
+  leftLeg.position.x = config.boss ? -.32 : isMarc ? -.27 : -.24;
+  rightLeg.position.x = config.boss ? .32 : isMarc ? .27 : .24;
   if (config.zombie) {
     leftArm.rotation.x = -.75;
     rightArm.rotation.x = -.75;
