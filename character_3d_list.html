@@ -3,69 +3,67 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>3D Character Cards | Rocket Boss Game</title>
+<title>3D Block Character Cards | Rocket Boss Game</title>
 <style>
 :root {
-  --ink: #171717;
+  --ink: #161411;
   --paper: #fffaf0;
-  --line: #202020;
-  --muted: #5d5a52;
-  --bg1: #efe3c7;
-  --bg2: #cdb887;
-  --green: #2f8f72;
+  --line: #222018;
+  --muted: #625e53;
+  --sand: #eadab7;
+  --ground: #8c7045;
 }
 
 * { box-sizing: border-box; }
 
-html, body {
+html,
+body {
   margin: 0;
   min-height: 100%;
   color: var(--ink);
   font-family: Arial, "Microsoft YaHei", sans-serif;
   background:
-    radial-gradient(circle at 12% 8%, rgba(47,143,114,.14), transparent 26%),
-    radial-gradient(circle at 88% 10%, rgba(230,107,61,.16), transparent 28%),
-    linear-gradient(180deg, var(--bg1), var(--bg2));
+    radial-gradient(circle at 14% 8%, rgba(47, 143, 114, .14), transparent 25%),
+    radial-gradient(circle at 90% 7%, rgba(228, 77, 38, .15), transparent 27%),
+    linear-gradient(180deg, #f4ecd8 0%, #d5bf8d 100%);
 }
 
-body {
-  overflow-x: hidden;
-}
+body { overflow-x: hidden; }
 
 .page {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 22px;
+  padding: 24px;
 }
 
 header {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 16px;
+  gap: 18px;
   align-items: end;
-  border-bottom: 3px solid var(--line);
   padding-bottom: 18px;
+  border-bottom: 3px solid var(--line);
 }
 
 h1 {
   margin: 0;
-  font-size: clamp(30px, 5vw, 54px);
+  font-size: clamp(32px, 5vw, 56px);
   line-height: 1;
 }
 
 .subtitle {
   margin: 10px 0 0;
+  max-width: 780px;
   color: var(--muted);
-  max-width: 720px;
   font-size: 16px;
 }
 
 .badge {
   border: 2px solid var(--line);
-  background: #fff;
   border-radius: 8px;
+  background: #fff;
   padding: 9px 12px;
-  font-weight: 800;
+  font-weight: 900;
   white-space: nowrap;
 }
 
@@ -77,189 +75,33 @@ h1 {
 }
 
 .card {
-  background: rgba(255,250,240,.93);
+  overflow: hidden;
+  background: rgba(255, 250, 240, .94);
   border: 3px solid var(--line);
   border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 14px 34px rgba(37, 29, 12, .17);
+  box-shadow: 0 14px 34px rgba(38, 30, 13, .18);
 }
 
 .viewer {
   position: relative;
-  height: 360px;
+  height: 370px;
   border-bottom: 3px solid var(--line);
-  background: linear-gradient(180deg, #dacbab 0%, #c9b481 62%, #92764a 62%, #92764a 100%);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.6) 0%, rgba(245,238,219,.18) 54%, transparent 55%),
+    linear-gradient(180deg, #d7c69f 0%, #c7b27d 62%, var(--ground) 62%, #715834 100%);
   cursor: grab;
   touch-action: none;
   user-select: none;
 }
 
-.viewer.dragging {
-  cursor: grabbing;
-}
+.viewer.dragging { cursor: grabbing; }
 
 .viewer canvas {
   position: absolute;
   inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
-}
-
-.fallback-model {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: end center;
-  perspective: 760px;
-  padding-bottom: 46px;
-}
-
-.webgl-ready .fallback-model {
-  display: none;
-}
-
-.fallback-floor {
-  position: absolute;
-  left: -20%;
-  right: -20%;
-  bottom: -8%;
-  height: 42%;
-  background:
-    repeating-linear-gradient(105deg, rgba(42,34,22,.55) 0 4px, transparent 4px 78px),
-    linear-gradient(180deg, #9a8054, #7c633d);
-  border-top: 3px solid rgba(32,32,32,.46);
-  transform: rotateX(58deg);
-  transform-origin: 50% 100%;
-}
-
-.css-character {
-  position: relative;
-  width: 118px;
-  height: 238px;
-  transform-style: preserve-3d;
-  animation: css-walk .72s ease-in-out infinite;
-}
-
-.css-character.boss-css {
-  width: 138px;
-  height: 284px;
-  animation-duration: .9s;
-}
-
-.css-part {
-  position: absolute;
-  left: 50%;
-  border: 2px solid rgba(20,18,16,.8);
-  box-shadow: inset -14px -10px 0 rgba(0,0,0,.16), 0 10px 18px rgba(0,0,0,.15);
-}
-
-.css-shadow {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 92px;
-  height: 22px;
-  transform: translateX(-50%) rotateX(78deg);
-  background: rgba(0,0,0,.28);
-  border-radius: 50%;
-  filter: blur(1px);
-}
-
-.css-head {
-  top: 20px;
-  width: 60px;
-  height: 54px;
-  margin-left: -30px;
-  border-radius: 18px;
-  background: var(--skin);
-  transform: translateZ(28px);
-}
-
-.robot-css .css-head {
-  border-radius: 5px;
-}
-
-.css-head::before,
-.css-head::after {
-  content: "";
-  position: absolute;
-  top: 25px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #101010;
-}
-
-.css-head::before { left: 17px; }
-.css-head::after { right: 17px; }
-
-.css-hair {
-  top: 13px;
-  width: 66px;
-  height: 22px;
-  margin-left: -33px;
-  border-radius: 50% 50% 12px 12px;
-  background: var(--hair);
-  transform: translateZ(34px);
-}
-
-.css-body {
-  top: 72px;
-  width: 72px;
-  height: 106px;
-  margin-left: -36px;
-  border-radius: 28px 28px 22px 22px;
-  background: var(--shirt);
-  transform: translateZ(18px);
-}
-
-.robot-css .css-body {
-  border-radius: 6px;
-}
-
-.boss-css .css-body {
-  width: 94px;
-  height: 136px;
-  margin-left: -47px;
-}
-
-.css-arm,
-.css-leg {
-  width: 18px;
-  border-radius: 999px;
-  background: var(--skin);
-  transform-origin: 50% 10%;
-}
-
-.css-arm {
-  top: 87px;
-  height: 84px;
-  animation: css-arm-left .72s ease-in-out infinite;
-}
-
-.css-arm.left { margin-left: -58px; }
-.css-arm.right {
-  margin-left: 40px;
-  animation-name: css-arm-right;
-}
-
-.css-leg {
-  top: 166px;
-  height: 74px;
-  background: var(--pants);
-  animation: css-leg-left .72s ease-in-out infinite;
-}
-
-.css-leg.left { margin-left: -32px; }
-.css-leg.right {
-  margin-left: 14px;
-  animation-name: css-leg-right;
-}
-
-.boss-css .css-arm,
-.boss-css .css-leg {
-  animation-duration: .9s;
 }
 
 .drag-hint {
@@ -270,9 +112,9 @@ h1 {
   border: 2px solid var(--line);
   border-radius: 999px;
   background: rgba(255,255,255,.9);
-  padding: 4px 8px;
+  padding: 4px 9px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .meta {
@@ -285,14 +127,14 @@ h1 {
 }
 
 .role {
+  margin: 0 0 10px;
   color: var(--muted);
   font-size: 13px;
-  margin: 0 0 10px;
 }
 
 .desc {
-  margin: 0;
   min-height: 48px;
+  margin: 0;
 }
 
 .stats {
@@ -303,9 +145,10 @@ h1 {
 }
 
 .stat {
+  min-width: 0;
   border: 2px solid var(--line);
-  background: #fff;
   border-radius: 6px;
+  background: #fff;
   padding: 8px;
   font-size: 12px;
 }
@@ -328,56 +171,29 @@ h1 {
   background: #fff;
   padding: 4px 8px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
-@keyframes css-walk {
-  0%, 100% { transform: translateY(0) rotateY(-14deg); }
-  50% { transform: translateY(-10px) rotateY(14deg); }
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-weight: 900;
 }
 
-@keyframes css-arm-left {
-  0%, 100% { transform: rotateZ(22deg) translateZ(22px); }
-  50% { transform: rotateZ(-26deg) translateZ(22px); }
-}
-
-@keyframes css-arm-right {
-  0%, 100% { transform: rotateZ(-26deg) translateZ(22px); }
-  50% { transform: rotateZ(22deg) translateZ(22px); }
-}
-
-@keyframes css-leg-left {
-  0%, 100% { transform: rotateZ(-18deg) translateZ(12px); }
-  50% { transform: rotateZ(18deg) translateZ(12px); }
-}
-
-@keyframes css-leg-right {
-  0%, 100% { transform: rotateZ(18deg) translateZ(12px); }
-  50% { transform: rotateZ(-18deg) translateZ(12px); }
-}
+.webgl-ready .fallback { display: none; }
 
 @media (max-width: 980px) {
-  header {
-    grid-template-columns: 1fr;
-  }
-
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  header { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
-  .page {
-    padding: 14px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .viewer {
-    height: 330px;
-  }
+  .page { padding: 14px; }
+  .grid { grid-template-columns: 1fr; }
+  .viewer { height: 340px; }
 }
 </style>
 </head>
@@ -385,103 +201,13 @@ h1 {
 <div class="page">
   <header>
     <div>
-      <h1>3D Character Cards</h1>
-      <p class="subtitle">每个角色单独放在一个框里。拖动角色框可以旋转模型，看正面、侧面和背面。</p>
+      <h1>3D Block Character Cards</h1>
+      <p class="subtitle">按原设计图重新做成方块角色：方块头、方块身体、细长手脚，并保留每个角色的武器、脸部和 Boss 造型特征。拖动每个角色框可以旋转查看。</p>
     </div>
-    <div class="badge">6 characters · drag to rotate</div>
+    <div class="badge">6 block models · drag to rotate</div>
   </header>
-
-  <main class="grid" id="grid">
-    <article class="card">
-      <div class="viewer">
-        <div class="drag-hint">Drag to rotate</div>
-        <div class="fallback-model">
-          <div class="fallback-floor"></div>
-          <div class="css-character" style="--skin:#efc49b;--shirt:#2f8f72;--pants:#385b93;--hair:#f1c64f">
-            <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span>
-          </div>
-        </div>
-      </div>
-      <div class="meta"><h2>Marc</h2><p class="role">Player · Explorer · Rocket builder</p><p class="desc">主角，负责探索普通世界、收集资源、制造火箭并进入 Boss 地图。</p><div class="stats"><div class="stat"><strong>12</strong>PV</div><div class="stat"><strong>3+</strong>Attack</div><div class="stat"><strong>Medium</strong>Speed</div></div><div class="tags"><span class="pill">Player</span><span class="pill">Tool</span><span class="pill">Rocket</span></div></div>
-    </article>
-    <article class="card">
-      <div class="viewer">
-        <div class="drag-hint">Drag to rotate</div>
-        <div class="fallback-model">
-          <div class="fallback-floor"></div>
-          <div class="css-character" style="--skin:#d89b71;--shirt:#1e4d7a;--pants:#2b2b31;--hair:#c8d7e8">
-            <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span>
-          </div>
-        </div>
-      </div>
-      <div class="meta"><h2>Davide</h2><p class="role">Enemy · Fast · Sword</p><p class="desc">强力敌人，移动快，适合做追击型近战单位。</p><div class="stats"><div class="stat"><strong>8</strong>PV</div><div class="stat"><strong>6+</strong>Attack</div><div class="stat"><strong>Fast</strong>Speed</div></div><div class="tags"><span class="pill">Enemy</span><span class="pill">Sword</span><span class="pill">Chase</span></div></div>
-    </article>
-    <article class="card">
-      <div class="viewer">
-        <div class="drag-hint">Drag to rotate</div>
-        <div class="fallback-model">
-          <div class="fallback-floor"></div>
-          <div class="css-character robot-css" style="--skin:#8792a2;--shirt:#a7b0bd;--pants:#59606c;--hair:#72d8ff">
-            <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span>
-          </div>
-        </div>
-      </div>
-      <div class="meta"><h2>Julie Robot</h2><p class="role">Robot · Guard · Smooth</p><p class="desc">机器人角色，守护重要资源，动作稳定但机械感更强。</p><div class="stats"><div class="stat"><strong>15</strong>PV</div><div class="stat"><strong>4+</strong>Attack</div><div class="stat"><strong>Steady</strong>Speed</div></div><div class="tags"><span class="pill">Robot</span><span class="pill">Guard</span><span class="pill">Resource</span></div></div>
-    </article>
-    <article class="card">
-      <div class="viewer">
-        <div class="drag-hint">Drag to rotate</div>
-        <div class="fallback-model">
-          <div class="fallback-floor"></div>
-          <div class="css-character" style="--skin:#c78962;--shirt:#7b2c28;--pants:#3c2a23;--hair:#f0a23a">
-            <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span>
-          </div>
-        </div>
-      </div>
-      <div class="meta"><h2>Olivier</h2><p class="role">Enemy · Ambush · High damage</p><p class="desc">高伤害敌人，适合躲在地图角落或资源点附近突然出现。</p><div class="stats"><div class="stat"><strong>7</strong>PV</div><div class="stat"><strong>7+</strong>Attack</div><div class="stat"><strong>Quick</strong>Speed</div></div><div class="tags"><span class="pill">Enemy</span><span class="pill">Ambush</span><span class="pill">Damage</span></div></div>
-    </article>
-    <article class="card">
-      <div class="viewer">
-        <div class="drag-hint">Drag to rotate</div>
-        <div class="fallback-model">
-          <div class="fallback-floor"></div>
-          <div class="css-character" style="--skin:#8db579;--shirt:#556b46;--pants:#3f4b39;--hair:#b44a4a">
-            <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span>
-          </div>
-        </div>
-      </div>
-      <div class="meta"><h2>Zombie</h2><p class="role">Enemy · Common · Map patrol</p><p class="desc">普通世界常见敌人，负责基础战斗压力。</p><div class="stats"><div class="stat"><strong>7</strong>PV</div><div class="stat"><strong>5</strong>Attack</div><div class="stat"><strong>Slow</strong>Speed</div></div><div class="tags"><span class="pill">Enemy</span><span class="pill">Patrol</span><span class="pill">Slow</span></div></div>
-    </article>
-    <article class="card">
-      <div class="viewer">
-        <div class="drag-hint">Drag to rotate</div>
-        <div class="fallback-model">
-          <div class="fallback-floor"></div>
-          <div class="css-character boss-css" style="--skin:#6d211c;--shirt:#e44d26;--pants:#322225;--hair:#ffd166">
-            <span class="css-shadow"></span><span class="css-part css-leg left"></span><span class="css-part css-leg right"></span><span class="css-part css-body"></span><span class="css-part css-arm left"></span><span class="css-part css-arm right"></span><span class="css-part css-head"></span><span class="css-part css-hair"></span>
-          </div>
-        </div>
-      </div>
-      <div class="meta"><h2>Boss</h2><p class="role">Final Boss · Volcano · Multi-arm</p><p class="desc">最终 Boss，驻守火山区域，攻击很高，是游戏结尾的主要目标。</p><div class="stats"><div class="stat"><strong>70</strong>PV</div><div class="stat"><strong>40</strong>Attack</div><div class="stat"><strong>Heavy</strong>Speed</div></div><div class="tags"><span class="pill">Boss</span><span class="pill">Volcano</span><span class="pill">Lava</span></div></div>
-    </article>
-  </main>
+  <main class="grid" id="grid"></main>
 </div>
-
-<template id="fallbackTemplate">
-  <div class="fallback-model">
-    <div class="fallback-floor"></div>
-    <div class="css-character">
-      <span class="css-shadow"></span>
-      <span class="css-part css-leg left"></span>
-      <span class="css-part css-leg right"></span>
-      <span class="css-part css-body"></span>
-      <span class="css-part css-arm left"></span>
-      <span class="css-part css-arm right"></span>
-      <span class="css-part css-head"></span>
-      <span class="css-part css-hair"></span>
-    </div>
-  </div>
-</template>
 
 <script type="module">
 import * as THREE from "./three.module.js";
@@ -491,114 +217,130 @@ const characters = [
     id: "marc",
     name: "Marc",
     role: "Player · Explorer · Rocket builder",
-    desc: "主角，负责探索普通世界、收集资源、制造火箭并进入 Boss 地图。",
+    desc: "主角，绿色方块头、白色上衣和细长四肢，接近原设计图里的普通玩家形象。",
     pv: "12",
     atk: "3+",
     speed: "Medium",
     tags: ["Player", "Tool", "Rocket"],
     scale: 1,
-    skin: 0xefc49b,
-    shirt: 0x2f8f72,
-    pants: 0x385b93,
-    hair: 0xf1c64f,
+    skin: 0x69a78b,
+    shirt: 0xf4f0e5,
+    pants: 0xcfd5de,
+    hair: 0x202020,
+    hand: 0x4a8b70,
+    eyes: 0x101010,
+    mouth: "flat",
     weapon: "pickaxe"
   },
   {
     id: "davide",
     name: "Davide",
     role: "Enemy · Fast · Sword",
-    desc: "强力敌人，移动快，适合做追击型近战单位。",
+    desc: "快速近战敌人，绿色脸、黑色斜发和手持剑，保留原画里奔跑攻击的感觉。",
     pv: "8",
     atk: "6+",
     speed: "Fast",
     tags: ["Enemy", "Sword", "Chase"],
-    scale: 1.02,
-    skin: 0xd89b71,
-    shirt: 0x1e4d7a,
-    pants: 0x2b2b31,
-    hair: 0xc8d7e8,
-    weapon: "sword"
+    scale: 1.03,
+    skin: 0x78a889,
+    shirt: 0xf0eee8,
+    pants: 0xded8ce,
+    hair: 0x191919,
+    hand: 0x4a8b70,
+    eyes: 0x1c2b6d,
+    mouth: "smile",
+    weapon: "sword",
+    forwardLean: true
   },
   {
     id: "julie",
     name: "Julie Robot",
     role: "Robot · Guard · Smooth",
-    desc: "机器人角色，守护重要资源，动作稳定但机械感更强。",
+    desc: "机器人角色，方形头和方块肩膀更宽，眼睛和关节带一点蓝色机械发光。",
     pv: "15",
     atk: "4+",
     speed: "Steady",
     tags: ["Robot", "Guard", "Resource"],
     scale: 1,
-    skin: 0x8792a2,
-    shirt: 0xa7b0bd,
-    pants: 0x59606c,
-    hair: 0x72d8ff,
+    skin: 0xc7cdd3,
+    shirt: 0xb8c0c9,
+    pants: 0xbfc5cc,
+    hair: 0x7edbff,
+    hand: 0x9da7b3,
+    eyes: 0x213040,
+    mouth: "smile",
     robot: true
   },
   {
     id: "olivier",
     name: "Olivier",
     role: "Enemy · Ambush · High damage",
-    desc: "高伤害敌人，适合躲在地图角落或资源点附近突然出现。",
+    desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。",
     pv: "7",
     atk: "7+",
     speed: "Quick",
     tags: ["Enemy", "Ambush", "Damage"],
     scale: 1.04,
-    skin: 0xc78962,
-    shirt: 0x7b2c28,
-    pants: 0x3c2a23,
-    hair: 0xf0a23a,
-    weapon: "club"
+    skin: 0x82b48b,
+    shirt: 0xf1eee5,
+    pants: 0xe3ddd3,
+    hair: 0x171717,
+    hand: 0x4f9474,
+    eyes: 0x101010,
+    mouth: "teeth",
+    weapon: "club",
+    forwardLean: true
   },
   {
     id: "zombie",
     name: "Zombie",
     role: "Enemy · Common · Map patrol",
-    desc: "普通世界常见敌人，负责基础战斗压力。",
+    desc: "普通世界敌人，灰绿皮肤、暗绿衣服和拖沓步态，用方块体型表现低速巡逻。",
     pv: "7",
     atk: "5",
     speed: "Slow",
     tags: ["Enemy", "Patrol", "Slow"],
     scale: .98,
-    skin: 0x8db579,
+    skin: 0x8fb07a,
     shirt: 0x556b46,
     pants: 0x3f4b39,
-    hair: 0xb44a4a,
+    hair: 0x713b3b,
+    hand: 0x82a96f,
+    eyes: 0x111111,
+    mouth: "flat",
     zombie: true
   },
   {
     id: "boss",
     name: "Boss",
     role: "Final Boss · Volcano · Multi-arm",
-    desc: "最终 Boss，驻守火山区域，攻击很高，是游戏结尾的主要目标。",
+    desc: "最终 Boss，按原画做成巨大方块身体、四条折臂、尖牙脸和两把长武器。",
     pv: "70",
     atk: "40",
     speed: "Heavy",
     tags: ["Boss", "Volcano", "Lava"],
-    scale: 1.28,
-    skin: 0x6d211c,
-    shirt: 0xe44d26,
-    pants: 0x322225,
-    hair: 0xffd166,
+    scale: 1.23,
+    skin: 0xaec1b4,
+    shirt: 0xf1eee5,
+    pants: 0x222222,
+    hair: 0x151515,
+    hand: 0xaec1b4,
+    eyes: 0x101010,
+    mouth: "teeth",
     boss: true
   }
 ];
 
 const grid = document.getElementById("grid");
-const cards = [];
-grid.innerHTML = "";
+const liveCards = [];
 
-function hex(color) {
-  return "#" + color.toString(16).padStart(6, "0");
-}
-
-function createCard(config) {
+function makeCard(config) {
   const card = document.createElement("article");
   card.className = "card";
   card.innerHTML = `
     <div class="viewer" data-id="${config.id}">
-      <canvas aria-label="${config.name} 3D model"></canvas>
+      <canvas aria-label="${config.name} block 3D model"></canvas>
+      <div class="fallback">3D model loading</div>
       <div class="drag-hint">Drag to rotate</div>
     </div>
     <div class="meta">
@@ -613,207 +355,201 @@ function createCard(config) {
       <div class="tags">${config.tags.map(tag => `<span class="pill">${tag}</span>`).join("")}</div>
     </div>
   `;
-
-  const fallback = document.getElementById("fallbackTemplate").content.firstElementChild.cloneNode(true);
-  const cssCharacter = fallback.querySelector(".css-character");
-  cssCharacter.style.setProperty("--skin", hex(config.skin));
-  cssCharacter.style.setProperty("--shirt", hex(config.shirt));
-  cssCharacter.style.setProperty("--pants", hex(config.pants));
-  cssCharacter.style.setProperty("--hair", hex(config.hair));
-  if (config.robot) cssCharacter.classList.add("robot-css");
-  if (config.boss) cssCharacter.classList.add("boss-css");
-  card.querySelector(".viewer").appendChild(fallback);
   grid.appendChild(card);
   return card;
 }
 
-function material(color, roughness = .72, metalness = .02) {
+function mat(color, roughness = .78, metalness = .02) {
   return new THREE.MeshStandardMaterial({ color, roughness, metalness });
 }
 
-function addPart(parent, geometry, mat, position, scale = [1, 1, 1], castShadow = true) {
-  const mesh = new THREE.Mesh(geometry, mat);
+function block(parent, size, color, position, options = {}) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(size[0], size[1], size[2]), mat(color, options.roughness, options.metalness));
   mesh.position.set(position[0], position[1], position[2]);
-  mesh.scale.set(scale[0], scale[1], scale[2]);
-  mesh.castShadow = castShadow;
+  mesh.castShadow = true;
   mesh.receiveShadow = true;
+  if (options.rotation) mesh.rotation.set(options.rotation[0], options.rotation[1], options.rotation[2]);
   parent.add(mesh);
   return mesh;
 }
 
-function addLimb(parent, config, side, kind) {
+function pixel(parent, size, color, position) {
+  const mesh = block(parent, size, color, position, { roughness: .62 });
+  mesh.castShadow = false;
+  return mesh;
+}
+
+function addFace(root, config, headY, headDepth) {
+  const z = headDepth / 2 + .012;
+  const eyeY = headY + (config.boss ? .05 : .03);
+  pixel(root, [.13, .13, .035], config.eyes, [-.16, eyeY, z]);
+  pixel(root, [.13, .13, .035], config.eyes, [.16, eyeY, z]);
+
+  if (config.mouth === "teeth") {
+    pixel(root, [.48, .08, .038], 0x111111, [0, headY - .18, z]);
+    for (let i = 0; i < 4; i++) {
+      pixel(root, [.07, .09, .04], 0xffffff, [-.18 + i * .12, headY - .13, z + .004]);
+    }
+  } else if (config.mouth === "smile") {
+    pixel(root, [.34, .055, .038], 0x111111, [0, headY - .19, z]);
+    pixel(root, [.065, .07, .038], 0x111111, [-.2, headY - .15, z]);
+    pixel(root, [.065, .07, .038], 0x111111, [.2, headY - .15, z]);
+  } else {
+    pixel(root, [.3, .055, .038], 0x111111, [0, headY - .18, z]);
+  }
+}
+
+function addHair(root, config, headY, headSize) {
+  const topY = headY + headSize[1] / 2 + .04;
+  block(root, [headSize[0] + .06, .12, headSize[2] + .05], config.hair, [0, topY, 0]);
+
+  if (config.id === "davide") {
+    block(root, [.56, .22, .12], config.hair, [-.14, topY - .04, .18], { rotation: [0, 0, -.38] });
+  }
+
+  if (config.id === "olivier" || config.boss) {
+    for (let i = 0; i < 5; i++) {
+      const spike = block(root, [.08, .28 + i * .025, .1], config.hair, [-.28 + i * .14, topY + .15, .02]);
+      spike.rotation.z = -.18 + i * .09;
+    }
+  }
+}
+
+function makeLimb(root, config, side, type, y, length, thickness) {
   const pivot = new THREE.Group();
-  pivot.position.set(side === "left" ? -.43 : .43, kind === "arm" ? 1.7 : .72, 0);
-  parent.add(pivot);
-  const length = kind === "arm" ? .82 : .94;
-  const radius = kind === "arm" ? .1 : .135;
-  const color = kind === "arm" ? config.skin : config.pants;
-  addPart(pivot, new THREE.CapsuleGeometry(radius, length, 8, 14), material(color), [0, -length * .46, 0]);
+  const x = side === "left" ? -.55 : .55;
+  pivot.position.set(x, y, 0);
+  root.add(pivot);
+  const color = type === "arm" ? config.hand : config.pants;
+  const limb = block(pivot, [thickness, length, thickness], color, [0, -length / 2, 0]);
+  limb.name = `${side}-${type}`;
   return pivot;
 }
 
-function addWeapon(parent, type) {
+function addWeapon(handPivot, type, side = "right") {
   if (!type) return;
   const group = new THREE.Group();
-  group.position.set(.04, -.56, .02);
-  parent.add(group);
+  group.position.set(0, -.72, .02);
+  handPivot.add(group);
+  const direction = side === "left" ? -1 : 1;
 
   if (type === "sword") {
-    addPart(group, new THREE.BoxGeometry(.06, 1.08, .06), material(0xdfe7ef, .35, .5), [0, -.05, 0]);
-    addPart(group, new THREE.BoxGeometry(.32, .07, .07), material(0x2b2b31), [0, .47, 0]);
+    block(group, [.07, 1.1, .07], 0xdfe7ef, [direction * .22, -.18, .12], { roughness: .35, metalness: .42, rotation: [0, 0, direction * -.48] });
+    block(group, [.38, .07, .09], 0x1c1c1c, [direction * .04, .21, .12], { rotation: [0, 0, direction * -.48] });
   } else if (type === "pickaxe") {
-    addPart(group, new THREE.BoxGeometry(.06, .96, .06), material(0x7a5434), [0, -.1, 0]);
-    addPart(group, new THREE.BoxGeometry(.58, .07, .07), material(0xb8c0c8, .42, .35), [0, .34, 0]);
+    block(group, [.07, .86, .07], 0x7a5434, [direction * .15, -.08, .1], { rotation: [0, 0, direction * -.28] });
+    block(group, [.62, .08, .08], 0xb9c0c8, [direction * .06, .34, .1], { roughness: .42, metalness: .28, rotation: [0, 0, direction * -.28] });
   } else if (type === "club") {
-    addPart(group, new THREE.CapsuleGeometry(.11, .82, 8, 12), material(0x5a3928), [0, -.08, 0]);
-    addPart(group, new THREE.SphereGeometry(.18, 16, 12), material(0x7d4b30), [0, .34, 0]);
+    block(group, [.13, .84, .13], 0x6a442e, [direction * .16, -.1, .1], { rotation: [0, 0, direction * -.35] });
+    block(group, [.28, .26, .2], 0x8a5633, [direction * .33, .22, .1], { rotation: [0, 0, direction * -.35] });
+  } else if (type === "bossBlade") {
+    block(group, [.1, 1.48, .09], 0x111111, [direction * .32, -.34, .08], { rotation: [0, 0, direction * -.5] });
+    block(group, [.32, .16, .11], 0xd8d8d8, [direction * .62, -.95, .08], { roughness: .36, metalness: .35, rotation: [0, 0, direction * -.5] });
   }
 }
 
-function buildModel(config) {
+function buildBlockCharacter(config) {
   const root = new THREE.Group();
   root.scale.setScalar(config.scale);
+  root.rotation.z = config.forwardLean ? -.04 : 0;
 
-  const bodyGeometry = config.robot
-    ? new THREE.BoxGeometry(.9, 1.18, .54)
-    : new THREE.CapsuleGeometry(.45, .94, 12, 20);
-  const body = addPart(root, bodyGeometry, material(config.shirt, .68, config.robot ? .26 : .02), [0, 1.38, 0]);
-  if (config.boss) body.scale.x = 1.18;
+  const bodySize = config.boss ? [1.28, 1.08, .52] : config.robot ? [1.18, .92, .5] : [.88, .95, .48];
+  const headSize = config.boss ? [.72, .72, .58] : config.robot ? [.78, .66, .58] : [.68, .72, .58];
+  const bodyY = config.boss ? 1.35 : 1.27;
+  const headY = config.boss ? 2.33 : 2.12;
 
-  const headGeometry = config.robot
-    ? new THREE.BoxGeometry(.7, .52, .56)
-    : new THREE.SphereGeometry(.37, 24, 18);
-  const head = addPart(root, headGeometry, material(config.skin, .62, config.robot ? .34 : .02), [0, 2.22, 0]);
+  const body = block(root, bodySize, config.shirt, [0, bodyY, 0]);
+  const neck = block(root, [.2, .28, .22], config.skin, [0, headY - .52, 0]);
+  const head = block(root, headSize, config.skin, [0, headY, 0]);
+  addHair(root, config, headY, headSize);
+  addFace(root, config, headY, headSize[2]);
 
-  const hair = config.robot
-    ? addPart(root, new THREE.SphereGeometry(.08, 12, 10), material(config.hair, .35, .45), [0, 2.58, 0])
-    : addPart(root, new THREE.SphereGeometry(.39, 24, 12, 0, Math.PI * 2, 0, Math.PI * .45), material(config.hair), [0, 2.33, 0]);
-  hair.scale.y = config.robot ? 1 : .42;
-
-  const eyeMat = material(config.boss ? 0xffd166 : config.robot ? 0x72d8ff : 0x111111, .4, config.robot ? .5 : .02);
-  addPart(root, new THREE.SphereGeometry(.045, 10, 8), eyeMat, [-.13, 2.24, .35]);
-  addPart(root, new THREE.SphereGeometry(.045, 10, 8), eyeMat, [.13, 2.24, .35]);
-
-  if (config.boss) {
-    addPart(root, new THREE.ConeGeometry(.13, .34, 4), material(config.hair), [-.18, 2.68, 0]);
-    addPart(root, new THREE.ConeGeometry(.13, .34, 4), material(config.hair), [.18, 2.68, 0]);
+  if (config.robot) {
+    pixel(root, [.08, .24, .04], 0x7edbff, [-.5, 1.3, .27]);
+    pixel(root, [.08, .24, .04], 0x7edbff, [.5, 1.3, .27]);
+    pixel(root, [.12, .12, .04], 0x7edbff, [0, 1.35, .28]);
   }
 
-  const leftArm = addLimb(root, config, "left", "arm");
-  const rightArm = addLimb(root, config, "right", "arm");
-  const leftLeg = addLimb(root, config, "left", "leg");
-  const rightLeg = addLimb(root, config, "right", "leg");
-  addWeapon(rightArm, config.weapon);
+  if (config.boss) {
+    pixel(root, [.84, .12, .04], 0x111111, [0, 1.62, .28]);
+    pixel(root, [.65, .06, .04], 0x111111, [0, 1.4, .28]);
+  }
+
+  const armLength = config.boss ? 1.02 : .92;
+  const legLength = config.boss ? .86 : .82;
+  const limbThickness = config.boss ? .16 : .13;
+  const leftArm = makeLimb(root, config, "left", "arm", config.boss ? 1.72 : 1.65, armLength, limbThickness);
+  const rightArm = makeLimb(root, config, "right", "arm", config.boss ? 1.72 : 1.65, armLength, limbThickness);
+  const leftLeg = makeLimb(root, config, "left", "leg", .84, legLength, config.boss ? .17 : .14);
+  const rightLeg = makeLimb(root, config, "right", "leg", .84, legLength, config.boss ? .17 : .14);
+  leftLeg.position.x = config.boss ? -.28 : -.22;
+  rightLeg.position.x = config.boss ? .28 : .22;
+
+  if (config.zombie) {
+    leftArm.rotation.x = -.75;
+    rightArm.rotation.x = -.75;
+  }
+
+  addWeapon(rightArm, config.weapon, "right");
 
   let extraLeft = null;
   let extraRight = null;
   if (config.boss) {
-    extraLeft = addLimb(root, config, "left", "arm");
-    extraRight = addLimb(root, config, "right", "arm");
-    extraLeft.position.set(-.6, 1.42, 0);
-    extraRight.position.set(.6, 1.42, 0);
+    extraLeft = makeLimb(root, config, "left", "arm", 1.36, 1.08, .15);
+    extraRight = makeLimb(root, config, "right", "arm", 1.36, 1.08, .15);
+    extraLeft.position.x = -.76;
+    extraRight.position.x = .76;
+    addWeapon(leftArm, "bossBlade", "left");
+    addWeapon(rightArm, "bossBlade", "right");
+    addWeapon(extraLeft, "bossBlade", "left");
+    addWeapon(extraRight, "bossBlade", "right");
   }
 
-  return { root, parts: { body, head, leftArm, rightArm, leftLeg, rightLeg, extraLeft, extraRight }, config };
+  return { root, parts: { body, neck, head, leftArm, rightArm, leftLeg, rightLeg, extraLeft, extraRight }, config };
 }
 
 function createScene(canvas, config) {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
-  scene.background = null;
-  const camera = new THREE.PerspectiveCamera(38, 1, .1, 40);
-  camera.position.set(0, 2.6, 6.8);
-  camera.lookAt(0, 1.25, 0);
+  const camera = new THREE.PerspectiveCamera(35, 1, .1, 40);
+  camera.position.set(0, 2.45, config.boss ? 7.2 : 6.4);
+  camera.lookAt(0, 1.3, 0);
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x80633d, 2.1));
-  const sun = new THREE.DirectionalLight(0xffffff, 2.2);
-  sun.position.set(4, 6, 5);
-  sun.castShadow = true;
-  scene.add(sun);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6d5430, 1.9));
+  const key = new THREE.DirectionalLight(0xffffff, 2.4);
+  key.position.set(4, 6, 4);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  scene.add(key);
 
-  const ground = new THREE.Mesh(
-    new THREE.BoxGeometry(4.8, .24, 4.1),
-    material(0x92764a, .88, .02)
-  );
-  ground.position.y = -.18;
+  const fill = new THREE.DirectionalLight(0xf5dfb4, .8);
+  fill.position.set(-3, 3, 2);
+  scene.add(fill);
+
+  const ground = block(scene, [5.1, .22, 4.2], 0x80643c, [0, -.13, 0], { roughness: .9 });
   ground.receiveShadow = true;
-  scene.add(ground);
+  ground.castShadow = false;
 
-  const model = buildModel(config);
+  const model = buildBlockCharacter(config);
   model.root.position.y = .04;
+  model.root.rotation.y = config.boss ? -.24 : .18;
   scene.add(model.root);
 
-  return { renderer, scene, camera, model, rotation: config.boss ? -.15 : .15, targetRotation: config.boss ? -.15 : .15, dragging: false, lastX: 0 };
+  return {
+    renderer,
+    scene,
+    camera,
+    model,
+    rotation: config.boss ? -.24 : .18,
+    targetRotation: config.boss ? -.24 : .18,
+    dragging: false,
+    lastX: 0
+  };
 }
-
-characters.forEach(config => {
-  const card = createCard(config);
-  const viewer = card.querySelector(".viewer");
-  const canvas = card.querySelector("canvas");
-  let entry = null;
-
-  try {
-    entry = createScene(canvas, config);
-    viewer.classList.add("webgl-ready");
-  } catch (error) {
-    console.error(error);
-  }
-
-  const start = event => {
-    if (!entry) return;
-    viewer.classList.add("dragging");
-    entry.dragging = true;
-    entry.lastX = event.clientX;
-    viewer.setPointerCapture?.(event.pointerId);
-  };
-  const move = event => {
-    if (!entry || !entry.dragging) return;
-    const delta = event.clientX - entry.lastX;
-    entry.lastX = event.clientX;
-    entry.targetRotation += delta * .012;
-  };
-  const end = () => {
-    if (!entry) return;
-    viewer.classList.remove("dragging");
-    entry.dragging = false;
-  };
-
-  viewer.addEventListener("pointerdown", start);
-  viewer.addEventListener("pointermove", move);
-  viewer.addEventListener("pointerup", end);
-  viewer.addEventListener("pointercancel", end);
-  if (entry) cards.push({ viewer, entry });
-});
-
-function animateModel(model, elapsed) {
-  const config = model.config;
-  const parts = model.parts;
-  const phase = elapsed * (config.boss ? 3.1 : config.zombie ? 3.5 : 4.3);
-  const swing = Math.sin(phase);
-  const counter = Math.cos(phase);
-  const weight = config.boss ? .5 : config.zombie ? .72 : 1;
-
-  model.root.position.y = .04 + Math.abs(swing) * .075 * weight;
-  parts.body.rotation.z = swing * .03 * weight;
-  parts.head.rotation.z = -swing * .045 * weight;
-  parts.leftArm.rotation.x = swing * .7 * weight;
-  parts.rightArm.rotation.x = -swing * .7 * weight;
-  parts.leftLeg.rotation.x = -swing * .62 * weight;
-  parts.rightLeg.rotation.x = swing * .62 * weight;
-
-  if (parts.extraLeft) parts.extraLeft.rotation.x = counter * .45;
-  if (parts.extraRight) parts.extraRight.rotation.x = -counter * .45;
-
-  if (config.zombie) {
-    parts.leftArm.rotation.x = -.92 + swing * .18;
-    parts.rightArm.rotation.x = -.92 - swing * .18;
-  }
-}
-
-const clock = new THREE.Clock();
 
 function resizeRenderer(entry, viewer) {
   const rect = viewer.getBoundingClientRect();
@@ -827,12 +563,77 @@ function resizeRenderer(entry, viewer) {
   }
 }
 
+function animateModel(model, elapsed) {
+  const { config, parts, root } = model;
+  const speed = config.boss ? 2.6 : config.zombie ? 3.1 : config.id === "davide" ? 4.8 : 4.1;
+  const swing = Math.sin(elapsed * speed);
+  const counter = Math.cos(elapsed * speed);
+  const weight = config.boss ? .5 : config.zombie ? .55 : 1;
+
+  root.position.y = .04 + Math.abs(swing) * .06 * weight;
+  parts.body.rotation.z = swing * .025 * weight;
+  parts.head.rotation.z = -swing * .035 * weight;
+
+  if (config.zombie) {
+    parts.leftArm.rotation.x = -.78 + swing * .1;
+    parts.rightArm.rotation.x = -.78 - swing * .1;
+  } else {
+    parts.leftArm.rotation.x = swing * .66 * weight;
+    parts.rightArm.rotation.x = -swing * .66 * weight;
+  }
+
+  parts.leftLeg.rotation.x = -swing * .58 * weight;
+  parts.rightLeg.rotation.x = swing * .58 * weight;
+
+  if (parts.extraLeft) parts.extraLeft.rotation.x = counter * .46;
+  if (parts.extraRight) parts.extraRight.rotation.x = -counter * .46;
+}
+
+function attachDrag(viewer, entry) {
+  viewer.addEventListener("pointerdown", event => {
+    viewer.classList.add("dragging");
+    entry.dragging = true;
+    entry.lastX = event.clientX;
+    viewer.setPointerCapture?.(event.pointerId);
+  });
+
+  viewer.addEventListener("pointermove", event => {
+    if (!entry.dragging) return;
+    const delta = event.clientX - entry.lastX;
+    entry.lastX = event.clientX;
+    entry.targetRotation += delta * .012;
+  });
+
+  const end = () => {
+    viewer.classList.remove("dragging");
+    entry.dragging = false;
+  };
+  viewer.addEventListener("pointerup", end);
+  viewer.addEventListener("pointercancel", end);
+}
+
+characters.forEach(config => {
+  const card = makeCard(config);
+  const viewer = card.querySelector(".viewer");
+  const canvas = card.querySelector("canvas");
+  try {
+    const entry = createScene(canvas, config);
+    viewer.classList.add("webgl-ready");
+    attachDrag(viewer, entry);
+    liveCards.push({ viewer, entry });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+const clock = new THREE.Clock();
+
 function render() {
   const elapsed = clock.getElapsedTime();
-  for (const { viewer, entry } of cards) {
+  for (const { viewer, entry } of liveCards) {
     resizeRenderer(entry, viewer);
     entry.rotation += (entry.targetRotation - entry.rotation) * .18;
-    if (!entry.dragging) entry.targetRotation += .0025;
+    if (!entry.dragging) entry.targetRotation += .0023;
     entry.model.root.rotation.y = entry.rotation;
     animateModel(entry.model, elapsed);
     entry.renderer.render(entry.scene, entry.camera);
