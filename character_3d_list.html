@@ -457,7 +457,29 @@ h1 {
 }
 
 .davide-css .hair {
-  transform: rotate(-10deg);
+  top: 2px;
+  width: 104px;
+  height: 18px;
+  margin-left: -56px;
+  transform: rotate(-12deg);
+  box-shadow: -18px 10px 0 var(--hair), 22px 6px 0 var(--hair);
+}
+
+.angry-css .eye {
+  width: 14px;
+  height: 9px;
+  transform: rotate(12deg);
+}
+
+.angry-css .eye.right {
+  transform: rotate(-12deg);
+}
+
+.angry-css .mouth {
+  top: 72px;
+  width: 30px;
+  height: 6px;
+  transform: rotate(4deg);
 }
 
 .spike {
@@ -771,7 +793,7 @@ h1 {
 (function () {
   window.characterData = [
     { id: "marc", name: "Marc", cssClass: "marc-css", role: "Player · Explorer · Rocket builder", desc: "主角，绿色方块头、白色上衣和粗壮方块四肢，先按真正 3D 方块体比例测试。", pv: "12", atk: "3+", speed: "Medium", tags: ["Player", "Tool", "Rocket"], skin: 0x69a78b, shirt: 0xf4f0e5, pants: 0xcfd5de, hair: 0x202020, hand: 0x4a8b70, eyes: 0x101010, mouth: "flat", weapon: "pickaxe", scale: 1 },
-    { id: "davide", name: "Davide", cssClass: "davide-css smile", role: "Enemy · Fast · Sword", desc: "快速近战敌人，绿色脸、黑色斜发和手持剑，保留原画里奔跑攻击的感觉。", pv: "8", atk: "6+", speed: "Fast", tags: ["Enemy", "Sword", "Chase"], skin: 0x78a889, shirt: 0xf0eee8, pants: 0xded8ce, hair: 0x191919, hand: 0x4a8b70, eyes: 0x1c2b6d, mouth: "smile", weapon: "sword", scale: 1.03, forwardLean: true },
+    { id: "davide", name: "Davide", cssClass: "davide-css angry-css", role: "Enemy · Fast · Sword", desc: "快速近战敌人，亮蓝色上衣、黑色腿、夸张扫发和凶狠眉眼，让他和其它绿色角色明显区分。", pv: "8", atk: "6+", speed: "Fast", tags: ["Enemy", "Sword", "Chase"], skin: 0x78a889, shirt: 0x1f78d1, pants: 0x171717, hair: 0x111111, hand: 0x4a8b70, eyes: 0x111111, mouth: "angry", weapon: "sword", scale: 1.03, forwardLean: true },
     { id: "julie", name: "Julie Robot", cssClass: "robot-css smile", role: "Robot · Guard · Smooth", desc: "机器人角色，方形头和方块肩膀更宽，眼睛和关节带一点蓝色机械发光。", pv: "15", atk: "4+", speed: "Steady", tags: ["Robot", "Guard", "Resource"], skin: 0xc7cdd3, shirt: 0xb8c0c9, pants: 0xbfc5cc, hair: 0x7edbff, hand: 0x9da7b3, eyes: 0x213040, mouth: "smile", scale: 1, robot: true },
     { id: "olivier", name: "Olivier", cssClass: "teeth-css", role: "Enemy · Ambush · High damage", desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。", pv: "7", atk: "7+", speed: "Quick", tags: ["Enemy", "Ambush", "Damage"], skin: 0x82b48b, shirt: 0xf1eee5, pants: 0xe3ddd3, hair: 0x171717, hand: 0x4f9474, eyes: 0x101010, mouth: "teeth", weapon: "club", scale: 1.04, forwardLean: true },
     { id: "zombie", name: "Zombie", cssClass: "", role: "Enemy · Common · Map patrol", desc: "普通世界敌人，灰绿皮肤、暗绿衣服和拖沓步态，用方块体型表现低速巡逻。", pv: "7", atk: "5", speed: "Slow", tags: ["Enemy", "Patrol", "Slow"], skin: 0x8fb07a, shirt: 0x556b46, pants: 0x3f4b39, hair: 0x713b3b, hand: 0x82a96f, eyes: 0x111111, mouth: "flat", scale: .98, zombie: true },
@@ -925,6 +947,13 @@ function addFace(root, config, headY, headDepth) {
   if (config.mouth === "teeth") {
     pixel(root, [.48, .08, .038], 0x111111, [0, headY - .18, z]);
     for (let i = 0; i < 4; i++) pixel(root, [.07, .09, .04], 0xffffff, [-.18 + i * .12, headY - .13, z + .004]);
+  } else if (config.mouth === "angry") {
+    const leftBrow = pixel(root, [.24, .045, .04], 0x111111, [-.17, headY + .16, z + .006]);
+    leftBrow.rotation.z = -.3;
+    const rightBrow = pixel(root, [.24, .045, .04], 0x111111, [.17, headY + .16, z + .006]);
+    rightBrow.rotation.z = .3;
+    const mouth = pixel(root, [.34, .06, .038], 0x111111, [0, headY - .2, z]);
+    mouth.rotation.z = .08;
   } else if (config.mouth === "smile") {
     pixel(root, [.34, .055, .038], 0x111111, [0, headY - .19, z]);
     pixel(root, [.065, .07, .038], 0x111111, [-.2, headY - .15, z]);
@@ -938,7 +967,12 @@ function addHair(root, config, headY, headSize) {
   const topY = headY + headSize[1] / 2 + .04;
   const hairDepth = config.id === "marc" ? headSize[2] + .12 : headSize[2] + .05;
   block(root, [headSize[0] + .06, .12, hairDepth], config.hair, [0, topY, 0]);
-  if (config.id === "davide") block(root, [.56, .22, .12], config.hair, [-.14, topY - .04, .18], { rotation: [0, 0, -.38] });
+  if (config.id === "davide") {
+    block(root, [.96, .16, hairDepth + .08], config.hair, [-.08, topY + .02, .01], { rotation: [0, 0, -.16] });
+    block(root, [.62, .24, .18], config.hair, [-.26, topY - .03, .29], { rotation: [0, 0, -.48] });
+    block(root, [.5, .14, .16], config.hair, [.28, topY - .02, .26], { rotation: [0, 0, .25] });
+    block(root, [.18, .34, .14], config.hair, [-.42, topY + .02, .08], { rotation: [0, 0, -.3] });
+  }
   if (config.id === "olivier" || config.boss) {
     for (let i = 0; i < 5; i++) {
       const spike = block(root, [.08, .28 + i * .025, .1], config.hair, [-.28 + i * .14, topY + .15, .02]);
