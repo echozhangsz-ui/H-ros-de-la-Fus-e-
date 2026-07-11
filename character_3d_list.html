@@ -7,10 +7,8 @@
 <style>
 :root {
   --ink: #161411;
-  --paper: #fffaf0;
   --line: #222018;
   --muted: #625e53;
-  --sand: #eadab7;
   --ground: #8c7045;
 }
 
@@ -99,6 +97,7 @@ h1 {
 .viewer canvas {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
@@ -108,13 +107,281 @@ h1 {
   position: absolute;
   left: 10px;
   bottom: 10px;
-  z-index: 2;
+  z-index: 3;
   border: 2px solid var(--line);
   border-radius: 999px;
   background: rgba(255,255,255,.9);
   padding: 4px 9px;
   font-size: 12px;
   font-weight: 900;
+}
+
+.fallback-model {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 52px;
+  pointer-events: none;
+}
+
+.webgl-ready .fallback-model {
+  display: none;
+}
+
+.fallback-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 58px;
+  width: 148px;
+  height: 28px;
+  transform: translateX(-50%) skewX(-16deg);
+  background: rgba(42, 31, 16, .24);
+}
+
+.block-person {
+  position: relative;
+  width: 170px;
+  height: 240px;
+  transform-origin: 50% 88%;
+  animation: css-walk .82s ease-in-out infinite;
+}
+
+.block-person.boss-css {
+  width: 230px;
+  height: 278px;
+  animation-duration: 1s;
+}
+
+.part {
+  position: absolute;
+  left: 50%;
+  border: 2px solid rgba(20, 18, 14, .76);
+  box-shadow: inset -9px -8px 0 rgba(0,0,0,.16), 0 7px 12px rgba(0,0,0,.12);
+}
+
+.head {
+  top: 18px;
+  width: 68px;
+  height: 70px;
+  margin-left: -34px;
+  background: var(--skin);
+}
+
+.robot-css .head {
+  width: 78px;
+  height: 66px;
+  margin-left: -39px;
+  background: var(--skin);
+}
+
+.boss-css .head {
+  width: 78px;
+  height: 76px;
+  margin-left: -39px;
+}
+
+.hair {
+  top: 11px;
+  width: 80px;
+  height: 13px;
+  margin-left: -40px;
+  background: var(--hair);
+}
+
+.davide-css .hair {
+  transform: rotate(-10deg);
+}
+
+.spike {
+  top: 0;
+  width: 8px;
+  height: 34px;
+  margin-left: -4px;
+  background: var(--hair);
+}
+
+.spike.s1 { transform: translateX(-28px) rotate(7deg); }
+.spike.s2 { transform: translateX(-14px) rotate(2deg); }
+.spike.s3 { transform: translateX(0) rotate(-3deg); }
+.spike.s4 { transform: translateX(14px) rotate(3deg); }
+.spike.s5 { transform: translateX(28px) rotate(-6deg); }
+
+.body {
+  top: 88px;
+  width: 88px;
+  height: 92px;
+  margin-left: -44px;
+  background: var(--shirt);
+}
+
+.robot-css .body {
+  width: 116px;
+  height: 86px;
+  margin-left: -58px;
+  background: var(--shirt);
+}
+
+.boss-css .body {
+  top: 96px;
+  width: 126px;
+  height: 112px;
+  margin-left: -63px;
+}
+
+.arm {
+  top: 94px;
+  width: 16px;
+  height: 96px;
+  margin-left: -68px;
+  background: var(--hand);
+  transform-origin: 50% 8%;
+  animation: css-arm-a .82s ease-in-out infinite;
+}
+
+.arm.right {
+  margin-left: 52px;
+  animation-name: css-arm-b;
+}
+
+.boss-css .arm {
+  top: 112px;
+  height: 112px;
+  margin-left: -92px;
+}
+
+.boss-css .arm.right {
+  margin-left: 76px;
+}
+
+.boss-css .arm.extra-left {
+  top: 132px;
+  margin-left: -118px;
+  transform: rotate(28deg);
+}
+
+.boss-css .arm.extra-right {
+  top: 132px;
+  margin-left: 102px;
+  transform: rotate(-28deg);
+}
+
+.leg {
+  top: 176px;
+  width: 16px;
+  height: 62px;
+  margin-left: -28px;
+  background: var(--pants);
+  transform-origin: 50% 8%;
+  animation: css-leg-a .82s ease-in-out infinite;
+}
+
+.leg.right {
+  margin-left: 14px;
+  animation-name: css-leg-b;
+}
+
+.boss-css .leg {
+  top: 204px;
+  width: 20px;
+  height: 70px;
+}
+
+.eye,
+.mouth,
+.tooth,
+.core,
+.weapon {
+  position: absolute;
+  left: 50%;
+  z-index: 4;
+  background: var(--ink);
+}
+
+.eye {
+  top: 46px;
+  width: 12px;
+  height: 12px;
+  margin-left: -20px;
+}
+
+.eye.right { margin-left: 10px; }
+
+.mouth {
+  top: 70px;
+  width: 32px;
+  height: 6px;
+  margin-left: -16px;
+}
+
+.smile .mouth {
+  height: 8px;
+  border-bottom: 5px solid var(--ink);
+  border-left: 5px solid var(--ink);
+  border-right: 5px solid var(--ink);
+  background: transparent;
+}
+
+.tooth {
+  top: 66px;
+  width: 8px;
+  height: 10px;
+  background: #fff;
+}
+
+.tooth.t1 { margin-left: -20px; }
+.tooth.t2 { margin-left: -7px; }
+.tooth.t3 { margin-left: 6px; }
+.tooth.t4 { margin-left: 19px; }
+
+.core {
+  top: 128px;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: #72d8ff;
+}
+
+.weapon {
+  top: 128px;
+  width: 8px;
+  height: 88px;
+  margin-left: 68px;
+  background: var(--weapon);
+  transform: rotate(28deg);
+}
+
+.sword {
+  width: 8px;
+  height: 112px;
+  margin-left: 70px;
+  background: #d8dde2;
+  transform: rotate(32deg);
+}
+
+.club {
+  width: 16px;
+  height: 76px;
+  margin-left: 65px;
+  background: #6a442e;
+  transform: rotate(-40deg);
+}
+
+.blade-left {
+  top: 168px;
+  height: 130px;
+  margin-left: -110px;
+  background: #111;
+  transform: rotate(-38deg);
+}
+
+.blade-right {
+  top: 168px;
+  height: 130px;
+  margin-left: 106px;
+  background: #111;
+  transform: rotate(38deg);
 }
 
 .meta {
@@ -174,16 +441,30 @@ h1 {
   font-weight: 900;
 }
 
-.fallback {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: var(--muted);
-  font-weight: 900;
+@keyframes css-walk {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
 }
 
-.webgl-ready .fallback { display: none; }
+@keyframes css-arm-a {
+  0%, 100% { transform: rotate(11deg); }
+  50% { transform: rotate(-16deg); }
+}
+
+@keyframes css-arm-b {
+  0%, 100% { transform: rotate(-16deg); }
+  50% { transform: rotate(11deg); }
+}
+
+@keyframes css-leg-a {
+  0%, 100% { transform: rotate(-12deg); }
+  50% { transform: rotate(14deg); }
+}
+
+@keyframes css-leg-b {
+  0%, 100% { transform: rotate(14deg); }
+  50% { transform: rotate(-12deg); }
+}
 
 @media (max-width: 980px) {
   header { grid-template-columns: 1fr; }
@@ -206,158 +487,70 @@ h1 {
     </div>
     <div class="badge">6 block models · drag to rotate</div>
   </header>
-  <main class="grid" id="grid"></main>
+  <main class="grid" id="grid" aria-live="polite"></main>
 </div>
+
+<script>
+(function () {
+  window.characterData = [
+    { id: "marc", name: "Marc", cssClass: "", role: "Player · Explorer · Rocket builder", desc: "主角，绿色方块头、白色上衣和细长四肢，接近原设计图里的普通玩家形象。", pv: "12", atk: "3+", speed: "Medium", tags: ["Player", "Tool", "Rocket"], skin: 0x69a78b, shirt: 0xf4f0e5, pants: 0xcfd5de, hair: 0x202020, hand: 0x4a8b70, eyes: 0x101010, mouth: "flat", weapon: "pickaxe", scale: 1 },
+    { id: "davide", name: "Davide", cssClass: "davide-css smile", role: "Enemy · Fast · Sword", desc: "快速近战敌人，绿色脸、黑色斜发和手持剑，保留原画里奔跑攻击的感觉。", pv: "8", atk: "6+", speed: "Fast", tags: ["Enemy", "Sword", "Chase"], skin: 0x78a889, shirt: 0xf0eee8, pants: 0xded8ce, hair: 0x191919, hand: 0x4a8b70, eyes: 0x1c2b6d, mouth: "smile", weapon: "sword", scale: 1.03, forwardLean: true },
+    { id: "julie", name: "Julie Robot", cssClass: "robot-css smile", role: "Robot · Guard · Smooth", desc: "机器人角色，方形头和方块肩膀更宽，眼睛和关节带一点蓝色机械发光。", pv: "15", atk: "4+", speed: "Steady", tags: ["Robot", "Guard", "Resource"], skin: 0xc7cdd3, shirt: 0xb8c0c9, pants: 0xbfc5cc, hair: 0x7edbff, hand: 0x9da7b3, eyes: 0x213040, mouth: "smile", scale: 1, robot: true },
+    { id: "olivier", name: "Olivier", cssClass: "teeth-css", role: "Enemy · Ambush · High damage", desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。", pv: "7", atk: "7+", speed: "Quick", tags: ["Enemy", "Ambush", "Damage"], skin: 0x82b48b, shirt: 0xf1eee5, pants: 0xe3ddd3, hair: 0x171717, hand: 0x4f9474, eyes: 0x101010, mouth: "teeth", weapon: "club", scale: 1.04, forwardLean: true },
+    { id: "zombie", name: "Zombie", cssClass: "", role: "Enemy · Common · Map patrol", desc: "普通世界敌人，灰绿皮肤、暗绿衣服和拖沓步态，用方块体型表现低速巡逻。", pv: "7", atk: "5", speed: "Slow", tags: ["Enemy", "Patrol", "Slow"], skin: 0x8fb07a, shirt: 0x556b46, pants: 0x3f4b39, hair: 0x713b3b, hand: 0x82a96f, eyes: 0x111111, mouth: "flat", scale: .98, zombie: true },
+    { id: "boss", name: "Boss", cssClass: "boss-css teeth-css", role: "Final Boss · Volcano · Multi-arm", desc: "最终 Boss，按原画做成巨大方块身体、四条折臂、尖牙脸和两把长武器。", pv: "70", atk: "40", speed: "Heavy", tags: ["Boss", "Volcano", "Lava"], skin: 0xaec1b4, shirt: 0xf1eee5, pants: 0x222222, hair: 0x151515, hand: 0xaec1b4, eyes: 0x101010, mouth: "teeth", scale: 1.23, boss: true }
+  ];
+
+  function hex(color) {
+    return "#" + color.toString(16).padStart(6, "0");
+  }
+
+  function faceHtml(config) {
+    var teeth = config.mouth === "teeth" ? '<span class="tooth t1"></span><span class="tooth t2"></span><span class="tooth t3"></span><span class="tooth t4"></span>' : "";
+    var spikes = (config.id === "olivier" || config.boss) ? '<span class="part spike s1"></span><span class="part spike s2"></span><span class="part spike s3"></span><span class="part spike s4"></span><span class="part spike s5"></span>' : "";
+    var core = config.robot ? '<span class="core"></span>' : "";
+    return spikes + '<span class="eye"></span><span class="eye right"></span><span class="mouth"></span>' + teeth + core;
+  }
+
+  function weaponHtml(config) {
+    if (config.weapon === "sword") return '<span class="weapon sword"></span>';
+    if (config.weapon === "club") return '<span class="weapon club"></span>';
+    if (config.weapon === "pickaxe") return '<span class="weapon"></span>';
+    if (config.boss) return '<span class="weapon blade-left"></span><span class="weapon blade-right"></span>';
+    return "";
+  }
+
+  function cardHtml(config) {
+    var style = "--skin:" + hex(config.skin) + ";--shirt:" + hex(config.shirt) + ";--pants:" + hex(config.pants) + ";--hair:" + hex(config.hair) + ";--hand:" + hex(config.hand) + ";--weapon:#7a5434;";
+    var extraArms = config.boss ? '<span class="part arm extra-left"></span><span class="part arm extra-right"></span>' : "";
+    return '<article class="card" data-id="' + config.id + '">' +
+      '<div class="viewer" data-id="' + config.id + '">' +
+        '<canvas aria-label="' + config.name + ' block 3D model"></canvas>' +
+        '<div class="fallback-model">' +
+          '<span class="fallback-shadow"></span>' +
+          '<div class="block-person ' + config.cssClass + '" style="' + style + '">' +
+            '<span class="part leg"></span><span class="part leg right"></span>' +
+            '<span class="part body"></span><span class="part arm"></span><span class="part arm right"></span>' + extraArms +
+            '<span class="part head"></span><span class="part hair"></span>' + faceHtml(config) + weaponHtml(config) +
+          '</div>' +
+        '</div>' +
+        '<div class="drag-hint">Drag to rotate</div>' +
+      '</div>' +
+      '<div class="meta"><h2>' + config.name + '</h2><p class="role">' + config.role + '</p><p class="desc">' + config.desc + '</p>' +
+      '<div class="stats"><div class="stat"><strong>' + config.pv + '</strong>PV</div><div class="stat"><strong>' + config.atk + '</strong>Attack</div><div class="stat"><strong>' + config.speed + '</strong>Speed</div></div>' +
+      '<div class="tags">' + config.tags.map(function (tag) { return '<span class="pill">' + tag + '</span>'; }).join("") + '</div></div></article>';
+  }
+
+  var grid = document.getElementById("grid");
+  grid.innerHTML = window.characterData.map(cardHtml).join("");
+}());
+</script>
 
 <script type="module">
 import * as THREE from "./three.module.js";
 
-const characters = [
-  {
-    id: "marc",
-    name: "Marc",
-    role: "Player · Explorer · Rocket builder",
-    desc: "主角，绿色方块头、白色上衣和细长四肢，接近原设计图里的普通玩家形象。",
-    pv: "12",
-    atk: "3+",
-    speed: "Medium",
-    tags: ["Player", "Tool", "Rocket"],
-    scale: 1,
-    skin: 0x69a78b,
-    shirt: 0xf4f0e5,
-    pants: 0xcfd5de,
-    hair: 0x202020,
-    hand: 0x4a8b70,
-    eyes: 0x101010,
-    mouth: "flat",
-    weapon: "pickaxe"
-  },
-  {
-    id: "davide",
-    name: "Davide",
-    role: "Enemy · Fast · Sword",
-    desc: "快速近战敌人，绿色脸、黑色斜发和手持剑，保留原画里奔跑攻击的感觉。",
-    pv: "8",
-    atk: "6+",
-    speed: "Fast",
-    tags: ["Enemy", "Sword", "Chase"],
-    scale: 1.03,
-    skin: 0x78a889,
-    shirt: 0xf0eee8,
-    pants: 0xded8ce,
-    hair: 0x191919,
-    hand: 0x4a8b70,
-    eyes: 0x1c2b6d,
-    mouth: "smile",
-    weapon: "sword",
-    forwardLean: true
-  },
-  {
-    id: "julie",
-    name: "Julie Robot",
-    role: "Robot · Guard · Smooth",
-    desc: "机器人角色，方形头和方块肩膀更宽，眼睛和关节带一点蓝色机械发光。",
-    pv: "15",
-    atk: "4+",
-    speed: "Steady",
-    tags: ["Robot", "Guard", "Resource"],
-    scale: 1,
-    skin: 0xc7cdd3,
-    shirt: 0xb8c0c9,
-    pants: 0xbfc5cc,
-    hair: 0x7edbff,
-    hand: 0x9da7b3,
-    eyes: 0x213040,
-    mouth: "smile",
-    robot: true
-  },
-  {
-    id: "olivier",
-    name: "Olivier",
-    role: "Enemy · Ambush · High damage",
-    desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。",
-    pv: "7",
-    atk: "7+",
-    speed: "Quick",
-    tags: ["Enemy", "Ambush", "Damage"],
-    scale: 1.04,
-    skin: 0x82b48b,
-    shirt: 0xf1eee5,
-    pants: 0xe3ddd3,
-    hair: 0x171717,
-    hand: 0x4f9474,
-    eyes: 0x101010,
-    mouth: "teeth",
-    weapon: "club",
-    forwardLean: true
-  },
-  {
-    id: "zombie",
-    name: "Zombie",
-    role: "Enemy · Common · Map patrol",
-    desc: "普通世界敌人，灰绿皮肤、暗绿衣服和拖沓步态，用方块体型表现低速巡逻。",
-    pv: "7",
-    atk: "5",
-    speed: "Slow",
-    tags: ["Enemy", "Patrol", "Slow"],
-    scale: .98,
-    skin: 0x8fb07a,
-    shirt: 0x556b46,
-    pants: 0x3f4b39,
-    hair: 0x713b3b,
-    hand: 0x82a96f,
-    eyes: 0x111111,
-    mouth: "flat",
-    zombie: true
-  },
-  {
-    id: "boss",
-    name: "Boss",
-    role: "Final Boss · Volcano · Multi-arm",
-    desc: "最终 Boss，按原画做成巨大方块身体、四条折臂、尖牙脸和两把长武器。",
-    pv: "70",
-    atk: "40",
-    speed: "Heavy",
-    tags: ["Boss", "Volcano", "Lava"],
-    scale: 1.23,
-    skin: 0xaec1b4,
-    shirt: 0xf1eee5,
-    pants: 0x222222,
-    hair: 0x151515,
-    hand: 0xaec1b4,
-    eyes: 0x101010,
-    mouth: "teeth",
-    boss: true
-  }
-];
-
-const grid = document.getElementById("grid");
+const characters = window.characterData || [];
 const liveCards = [];
-
-function makeCard(config) {
-  const card = document.createElement("article");
-  card.className = "card";
-  card.innerHTML = `
-    <div class="viewer" data-id="${config.id}">
-      <canvas aria-label="${config.name} block 3D model"></canvas>
-      <div class="fallback">3D model loading</div>
-      <div class="drag-hint">Drag to rotate</div>
-    </div>
-    <div class="meta">
-      <h2>${config.name}</h2>
-      <p class="role">${config.role}</p>
-      <p class="desc">${config.desc}</p>
-      <div class="stats">
-        <div class="stat"><strong>${config.pv}</strong>PV</div>
-        <div class="stat"><strong>${config.atk}</strong>Attack</div>
-        <div class="stat"><strong>${config.speed}</strong>Speed</div>
-      </div>
-      <div class="tags">${config.tags.map(tag => `<span class="pill">${tag}</span>`).join("")}</div>
-    </div>
-  `;
-  grid.appendChild(card);
-  return card;
-}
 
 function mat(color, roughness = .78, metalness = .02) {
   return new THREE.MeshStandardMaterial({ color, roughness, metalness });
@@ -387,9 +580,7 @@ function addFace(root, config, headY, headDepth) {
 
   if (config.mouth === "teeth") {
     pixel(root, [.48, .08, .038], 0x111111, [0, headY - .18, z]);
-    for (let i = 0; i < 4; i++) {
-      pixel(root, [.07, .09, .04], 0xffffff, [-.18 + i * .12, headY - .13, z + .004]);
-    }
+    for (let i = 0; i < 4; i++) pixel(root, [.07, .09, .04], 0xffffff, [-.18 + i * .12, headY - .13, z + .004]);
   } else if (config.mouth === "smile") {
     pixel(root, [.34, .055, .038], 0x111111, [0, headY - .19, z]);
     pixel(root, [.065, .07, .038], 0x111111, [-.2, headY - .15, z]);
@@ -402,11 +593,7 @@ function addFace(root, config, headY, headDepth) {
 function addHair(root, config, headY, headSize) {
   const topY = headY + headSize[1] / 2 + .04;
   block(root, [headSize[0] + .06, .12, headSize[2] + .05], config.hair, [0, topY, 0]);
-
-  if (config.id === "davide") {
-    block(root, [.56, .22, .12], config.hair, [-.14, topY - .04, .18], { rotation: [0, 0, -.38] });
-  }
-
+  if (config.id === "davide") block(root, [.56, .22, .12], config.hair, [-.14, topY - .04, .18], { rotation: [0, 0, -.38] });
   if (config.id === "olivier" || config.boss) {
     for (let i = 0; i < 5; i++) {
       const spike = block(root, [.08, .28 + i * .025, .1], config.hair, [-.28 + i * .14, topY + .15, .02]);
@@ -417,12 +604,9 @@ function addHair(root, config, headY, headSize) {
 
 function makeLimb(root, config, side, type, y, length, thickness) {
   const pivot = new THREE.Group();
-  const x = side === "left" ? -.55 : .55;
-  pivot.position.set(x, y, 0);
+  pivot.position.set(side === "left" ? -.55 : .55, y, 0);
   root.add(pivot);
-  const color = type === "arm" ? config.hand : config.pants;
-  const limb = block(pivot, [thickness, length, thickness], color, [0, -length / 2, 0]);
-  limb.name = `${side}-${type}`;
+  block(pivot, [thickness, length, thickness], type === "arm" ? config.hand : config.pants, [0, -length / 2, 0]);
   return pivot;
 }
 
@@ -459,7 +643,7 @@ function buildBlockCharacter(config) {
   const headY = config.boss ? 2.33 : 2.12;
 
   const body = block(root, bodySize, config.shirt, [0, bodyY, 0]);
-  const neck = block(root, [.2, .28, .22], config.skin, [0, headY - .52, 0]);
+  block(root, [.2, .28, .22], config.skin, [0, headY - .52, 0]);
   const head = block(root, headSize, config.skin, [0, headY, 0]);
   addHair(root, config, headY, headSize);
   addFace(root, config, headY, headSize[2]);
@@ -469,7 +653,6 @@ function buildBlockCharacter(config) {
     pixel(root, [.08, .24, .04], 0x7edbff, [.5, 1.3, .27]);
     pixel(root, [.12, .12, .04], 0x7edbff, [0, 1.35, .28]);
   }
-
   if (config.boss) {
     pixel(root, [.84, .12, .04], 0x111111, [0, 1.62, .28]);
     pixel(root, [.65, .06, .04], 0x111111, [0, 1.4, .28]);
@@ -484,12 +667,10 @@ function buildBlockCharacter(config) {
   const rightLeg = makeLimb(root, config, "right", "leg", .84, legLength, config.boss ? .17 : .14);
   leftLeg.position.x = config.boss ? -.28 : -.22;
   rightLeg.position.x = config.boss ? .28 : .22;
-
   if (config.zombie) {
     leftArm.rotation.x = -.75;
     rightArm.rotation.x = -.75;
   }
-
   addWeapon(rightArm, config.weapon, "right");
 
   let extraLeft = null;
@@ -505,7 +686,7 @@ function buildBlockCharacter(config) {
     addWeapon(extraRight, "bossBlade", "right");
   }
 
-  return { root, parts: { body, neck, head, leftArm, rightArm, leftLeg, rightLeg, extraLeft, extraRight }, config };
+  return { root, parts: { body, head, leftArm, rightArm, leftLeg, rightLeg, extraLeft, extraRight }, config };
 }
 
 function createScene(canvas, config) {
@@ -523,9 +704,7 @@ function createScene(canvas, config) {
   const key = new THREE.DirectionalLight(0xffffff, 2.4);
   key.position.set(4, 6, 4);
   key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024);
   scene.add(key);
-
   const fill = new THREE.DirectionalLight(0xf5dfb4, .8);
   fill.position.set(-3, 3, 2);
   scene.add(fill);
@@ -539,16 +718,7 @@ function createScene(canvas, config) {
   model.root.rotation.y = config.boss ? -.24 : .18;
   scene.add(model.root);
 
-  return {
-    renderer,
-    scene,
-    camera,
-    model,
-    rotation: config.boss ? -.24 : .18,
-    targetRotation: config.boss ? -.24 : .18,
-    dragging: false,
-    lastX: 0
-  };
+  return { renderer, scene, camera, model, rotation: config.boss ? -.24 : .18, targetRotation: config.boss ? -.24 : .18, dragging: false, lastX: 0 };
 }
 
 function resizeRenderer(entry, viewer) {
@@ -573,7 +743,6 @@ function animateModel(model, elapsed) {
   root.position.y = .04 + Math.abs(swing) * .06 * weight;
   parts.body.rotation.z = swing * .025 * weight;
   parts.head.rotation.z = -swing * .035 * weight;
-
   if (config.zombie) {
     parts.leftArm.rotation.x = -.78 + swing * .1;
     parts.rightArm.rotation.x = -.78 - swing * .1;
@@ -581,10 +750,8 @@ function animateModel(model, elapsed) {
     parts.leftArm.rotation.x = swing * .66 * weight;
     parts.rightArm.rotation.x = -swing * .66 * weight;
   }
-
   parts.leftLeg.rotation.x = -swing * .58 * weight;
   parts.rightLeg.rotation.x = swing * .58 * weight;
-
   if (parts.extraLeft) parts.extraLeft.rotation.x = counter * .46;
   if (parts.extraRight) parts.extraRight.rotation.x = -counter * .46;
 }
@@ -596,14 +763,12 @@ function attachDrag(viewer, entry) {
     entry.lastX = event.clientX;
     viewer.setPointerCapture?.(event.pointerId);
   });
-
   viewer.addEventListener("pointermove", event => {
     if (!entry.dragging) return;
     const delta = event.clientX - entry.lastX;
     entry.lastX = event.clientX;
     entry.targetRotation += delta * .012;
   });
-
   const end = () => {
     viewer.classList.remove("dragging");
     entry.dragging = false;
@@ -613,7 +778,8 @@ function attachDrag(viewer, entry) {
 }
 
 characters.forEach(config => {
-  const card = makeCard(config);
+  const card = document.querySelector('.card[data-id="' + config.id + '"]');
+  if (!card) return;
   const viewer = card.querySelector(".viewer");
   const canvas = card.querySelector("canvas");
   try {
