@@ -71,3 +71,10 @@ https://echozhangsz-ui.github.io/H-ros-de-la-Fus-e-/character_3d_list.html?v=COM
 ```
 
 如果打开后只有标题没有卡片，说明基础渲染结构被破坏，必须先恢复普通 HTML/CSS fallback，再检查 Three.js。
+
+## Fallback 3D rule
+
+- Do not use flat single-plane body parts for the tested Marc model.
+- If WebGL fails, Marc must still be made from cuboids with six faces per part.
+- Face details such as eyes and mouth must be attached only to the front face.
+- Before publishing, block `three.module.js` locally and verify the fallback still has visible depth at 45 degrees and 90 degrees.

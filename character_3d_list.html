@@ -257,6 +257,169 @@ h1 {
     var(--shirt);
 }
 
+.voxel-marc {
+  position: relative;
+  width: 190px;
+  height: 255px;
+  transform-style: preserve-3d;
+  transform-origin: 50% 82%;
+  animation: voxel-marc-walk .82s ease-in-out infinite;
+}
+
+.voxel-marc .cube {
+  position: absolute;
+  left: calc(50% + var(--x, 0px));
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  margin-left: calc(var(--w) / -2);
+  transform-style: preserve-3d;
+}
+
+.voxel-marc .face {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid rgba(20, 18, 14, .78);
+  background: var(--c);
+  backface-visibility: hidden;
+}
+
+.voxel-marc .front,
+.voxel-marc .back {
+  width: var(--w);
+  height: var(--h);
+}
+
+.voxel-marc .front {
+  transform: translateZ(calc(var(--d) / 2));
+  box-shadow: inset -10px -9px 0 rgba(0,0,0,.12);
+}
+
+.voxel-marc .back {
+  transform: rotateY(180deg) translateZ(calc(var(--d) / 2));
+  filter: brightness(.88);
+}
+
+.voxel-marc .right,
+.voxel-marc .left {
+  left: calc((var(--w) - var(--d)) / 2);
+  width: var(--d);
+  height: var(--h);
+}
+
+.voxel-marc .right {
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2));
+  filter: brightness(.8);
+}
+
+.voxel-marc .left {
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+  filter: brightness(.92);
+}
+
+.voxel-marc .top,
+.voxel-marc .bottom {
+  top: calc((var(--h) - var(--d)) / 2);
+  width: var(--w);
+  height: var(--d);
+}
+
+.voxel-marc .top {
+  transform: rotateX(90deg) translateZ(calc(var(--h) / 2));
+  filter: brightness(1.12);
+}
+
+.voxel-marc .bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--h) / 2));
+  filter: brightness(.72);
+}
+
+.voxel-marc .head-cube {
+  --x: 0px;
+  --y: 18px;
+  --w: 62px;
+  --h: 72px;
+  --d: 58px;
+  --c: var(--skin);
+}
+
+.voxel-marc .hair-cube {
+  --x: 0px;
+  --y: 8px;
+  --w: 76px;
+  --h: 14px;
+  --d: 64px;
+  --c: var(--hair);
+}
+
+.voxel-marc .body-cube {
+  --x: 0px;
+  --y: 90px;
+  --w: 78px;
+  --h: 92px;
+  --d: 46px;
+  --c: var(--shirt);
+}
+
+.voxel-marc .arm-left-cube,
+.voxel-marc .arm-right-cube {
+  --y: 96px;
+  --w: 34px;
+  --h: 102px;
+  --d: 34px;
+  --c: var(--hand);
+}
+
+.voxel-marc .arm-left-cube { --x: -58px; }
+.voxel-marc .arm-right-cube { --x: 58px; }
+
+.voxel-marc .leg-left-cube,
+.voxel-marc .leg-right-cube {
+  --y: 178px;
+  --w: 32px;
+  --h: 68px;
+  --d: 32px;
+  --c: var(--pants);
+}
+
+.voxel-marc .leg-left-cube { --x: -18px; }
+.voxel-marc .leg-right-cube { --x: 18px; }
+
+.voxel-marc .tool-cube {
+  --x: 66px;
+  --y: 126px;
+  --w: 8px;
+  --h: 92px;
+  --d: 8px;
+  --c: var(--weapon);
+  transform: rotateZ(28deg);
+}
+
+.voxel-marc .v-eye,
+.voxel-marc .v-mouth {
+  position: absolute;
+  z-index: 2;
+  background: #111;
+}
+
+.voxel-marc .v-eye {
+  top: 22px;
+  left: 18px;
+  width: 9px;
+  height: 10px;
+}
+
+.voxel-marc .v-eye.right {
+  left: 38px;
+}
+
+.voxel-marc .v-mouth {
+  left: 20px;
+  top: 50px;
+  width: 24px;
+  height: 6px;
+}
+
 .part {
   position: absolute;
   left: 50%;
@@ -555,6 +718,11 @@ h1 {
   50% { transform: translateY(-8px); }
 }
 
+@keyframes voxel-marc-walk {
+  0%, 100% { transform: rotateY(var(--fallback-rotation, 0deg)) translateY(0) rotateZ(-1deg); }
+  50% { transform: rotateY(var(--fallback-rotation, 0deg)) translateY(-8px) rotateZ(1deg); }
+}
+
 @keyframes css-arm-a {
   0%, 100% { transform: rotate(11deg); }
   50% { transform: rotate(-16deg); }
@@ -629,19 +797,43 @@ h1 {
     return "";
   }
 
+  function cubeHtml(name, faceContent) {
+    return '<div class="cube ' + name + '-cube">' +
+      '<span class="face front">' + (faceContent || "") + '</span>' +
+      '<span class="face back"></span>' +
+      '<span class="face right"></span>' +
+      '<span class="face left"></span>' +
+      '<span class="face top"></span>' +
+      '<span class="face bottom"></span>' +
+    '</div>';
+  }
+
+  function marcFallbackHtml(style) {
+    var face = '<span class="v-eye"></span><span class="v-eye right"></span><span class="v-mouth"></span>';
+    return '<div class="voxel-marc" style="' + style + '">' +
+      cubeHtml("leg-left") + cubeHtml("leg-right") +
+      cubeHtml("body") +
+      cubeHtml("arm-left") + cubeHtml("arm-right") +
+      cubeHtml("head", face) + cubeHtml("hair") +
+      cubeHtml("tool") +
+    '</div>';
+  }
+
   function cardHtml(config) {
     var style = "--skin:" + hex(config.skin) + ";--shirt:" + hex(config.shirt) + ";--pants:" + hex(config.pants) + ";--hair:" + hex(config.hair) + ";--hand:" + hex(config.hand) + ";--weapon:#7a5434;";
     var extraArms = config.boss ? '<span class="part arm extra-left"></span><span class="part arm extra-right"></span>' : "";
+    var fallback = config.id === "marc" ? marcFallbackHtml(style) :
+      '<div class="block-person ' + config.cssClass + '" style="' + style + '">' +
+        '<span class="part leg"></span><span class="part leg right"></span>' +
+        '<span class="part body"></span><span class="part arm"></span><span class="part arm right"></span>' + extraArms +
+        '<span class="part head"></span><span class="part hair"></span>' + faceHtml(config) + weaponHtml(config) +
+      '</div>';
     return '<article class="card" data-id="' + config.id + '">' +
       '<div class="viewer" data-id="' + config.id + '">' +
         '<canvas aria-label="' + config.name + ' block 3D model"></canvas>' +
         '<div class="fallback-model">' +
           '<span class="fallback-shadow"></span>' +
-          '<div class="block-person ' + config.cssClass + '" style="' + style + '">' +
-            '<span class="part leg"></span><span class="part leg right"></span>' +
-            '<span class="part body"></span><span class="part arm"></span><span class="part arm right"></span>' + extraArms +
-            '<span class="part head"></span><span class="part hair"></span>' + faceHtml(config) + weaponHtml(config) +
-          '</div>' +
+          fallback +
         '</div>' +
         '<div class="drag-hint">Drag to rotate</div>' +
       '</div>' +
@@ -654,7 +846,7 @@ h1 {
   grid.innerHTML = window.characterData.map(cardHtml).join("");
 
   document.querySelectorAll(".viewer").forEach(function (viewer) {
-    var model = viewer.querySelector(".block-person");
+    var model = viewer.querySelector(".block-person, .voxel-marc");
     var rotation = 0;
     var dragging = false;
     var lastX = 0;
