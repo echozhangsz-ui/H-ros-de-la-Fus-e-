@@ -162,6 +162,19 @@ h1 {
 
 .marc-css .part {
   box-shadow: inset -10px -8px 0 rgba(0,0,0,.14), 0 7px 12px rgba(0,0,0,.14);
+  transition:
+    top .18s ease,
+    width .18s ease,
+    height .18s ease,
+    margin-left .18s ease,
+    background .18s ease,
+    opacity .14s ease,
+    transform .18s ease;
+}
+
+.marc-css .eye,
+.marc-css .mouth {
+  transition: opacity .12s ease;
 }
 
 .marc-css.marc-side {
@@ -222,22 +235,9 @@ h1 {
   display: none;
 }
 
-.marc-css.marc-side .eye {
-  top: 48px;
-  width: 8px;
-  height: 12px;
-  margin-left: -2px;
-}
-
-.marc-css.marc-side .eye.right {
-  display: none;
-}
-
+.marc-css.marc-side .eye,
 .marc-css.marc-side .mouth {
-  top: 72px;
-  width: 16px;
-  height: 5px;
-  margin-left: -8px;
+  opacity: 0;
 }
 
 .marc-css.marc-back .eye,
@@ -665,8 +665,8 @@ h1 {
       model.style.setProperty("--fallback-rotation", rotation + "deg");
       if (model.classList.contains("marc-css")) {
         var normalized = ((rotation % 360) + 360) % 360;
-        var side = (normalized >= 45 && normalized <= 135) || (normalized >= 225 && normalized <= 315);
-        var back = normalized > 135 && normalized < 225;
+        var side = (normalized >= 60 && normalized <= 120) || (normalized >= 240 && normalized <= 300);
+        var back = normalized > 152 && normalized < 208;
         model.classList.toggle("marc-side", side);
         model.classList.toggle("marc-back", back);
       }
