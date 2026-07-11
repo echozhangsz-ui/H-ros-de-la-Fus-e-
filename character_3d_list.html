@@ -234,59 +234,60 @@ h1 {
 
 .arm {
   top: 94px;
-  width: 16px;
+  width: 32px;
   height: 96px;
-  margin-left: -68px;
+  margin-left: -78px;
   background: var(--hand);
   transform-origin: 50% 8%;
   animation: css-arm-a .82s ease-in-out infinite;
 }
 
 .arm.right {
-  margin-left: 52px;
+  margin-left: 46px;
   animation-name: css-arm-b;
 }
 
 .boss-css .arm {
   top: 112px;
+  width: 34px;
   height: 112px;
-  margin-left: -92px;
+  margin-left: -106px;
 }
 
 .boss-css .arm.right {
-  margin-left: 76px;
+  margin-left: 72px;
 }
 
 .boss-css .arm.extra-left {
   top: 132px;
-  margin-left: -118px;
+  margin-left: -138px;
   transform: rotate(28deg);
 }
 
 .boss-css .arm.extra-right {
   top: 132px;
-  margin-left: 102px;
+  margin-left: 104px;
   transform: rotate(-28deg);
 }
 
 .leg {
   top: 176px;
-  width: 16px;
-  height: 62px;
-  margin-left: -28px;
+  width: 30px;
+  height: 66px;
+  margin-left: -38px;
   background: var(--pants);
   transform-origin: 50% 8%;
   animation: css-leg-a .82s ease-in-out infinite;
 }
 
 .leg.right {
-  margin-left: 14px;
+  margin-left: 8px;
   animation-name: css-leg-b;
 }
 
 .boss-css .leg {
   top: 204px;
-  width: 20px;
+  width: 34px;
   height: 70px;
 }
 
@@ -641,7 +642,8 @@ function addHair(root, config, headY, headSize) {
 
 function makeLimb(root, config, side, type, y, length, thickness) {
   const pivot = new THREE.Group();
-  pivot.position.set(side === "left" ? -.55 : .55, y, 0);
+  const shoulderSpread = config.boss ? .72 : config.robot && type === "arm" ? .68 : .61;
+  pivot.position.set(side === "left" ? -shoulderSpread : shoulderSpread, y, 0);
   root.add(pivot);
   block(pivot, [thickness, length, thickness], type === "arm" ? config.hand : config.pants, [0, -length / 2, 0]);
   return pivot;
@@ -697,13 +699,14 @@ function buildBlockCharacter(config) {
 
   const armLength = config.boss ? 1.02 : .92;
   const legLength = config.boss ? .86 : .82;
-  const limbThickness = config.boss ? .16 : .13;
-  const leftArm = makeLimb(root, config, "left", "arm", config.boss ? 1.72 : 1.65, armLength, limbThickness);
-  const rightArm = makeLimb(root, config, "right", "arm", config.boss ? 1.72 : 1.65, armLength, limbThickness);
-  const leftLeg = makeLimb(root, config, "left", "leg", .84, legLength, config.boss ? .17 : .14);
-  const rightLeg = makeLimb(root, config, "right", "leg", .84, legLength, config.boss ? .17 : .14);
-  leftLeg.position.x = config.boss ? -.28 : -.22;
-  rightLeg.position.x = config.boss ? .28 : .22;
+  const armThickness = config.boss ? .34 : config.robot ? .31 : .3;
+  const legThickness = config.boss ? .36 : .32;
+  const leftArm = makeLimb(root, config, "left", "arm", config.boss ? 1.72 : 1.65, armLength, armThickness);
+  const rightArm = makeLimb(root, config, "right", "arm", config.boss ? 1.72 : 1.65, armLength, armThickness);
+  const leftLeg = makeLimb(root, config, "left", "leg", .84, legLength, legThickness);
+  const rightLeg = makeLimb(root, config, "right", "leg", .84, legLength, legThickness);
+  leftLeg.position.x = config.boss ? -.32 : -.24;
+  rightLeg.position.x = config.boss ? .32 : .24;
   if (config.zombie) {
     leftArm.rotation.x = -.75;
     rightArm.rotation.x = -.75;
@@ -713,10 +716,10 @@ function buildBlockCharacter(config) {
   let extraLeft = null;
   let extraRight = null;
   if (config.boss) {
-    extraLeft = makeLimb(root, config, "left", "arm", 1.36, 1.08, .15);
-    extraRight = makeLimb(root, config, "right", "arm", 1.36, 1.08, .15);
-    extraLeft.position.x = -.76;
-    extraRight.position.x = .76;
+    extraLeft = makeLimb(root, config, "left", "arm", 1.36, 1.08, .3);
+    extraRight = makeLimb(root, config, "right", "arm", 1.36, 1.08, .3);
+    extraLeft.position.x = -.9;
+    extraRight.position.x = .9;
     addWeapon(leftArm, "bossBlade", "left");
     addWeapon(rightArm, "bossBlade", "right");
     addWeapon(extraLeft, "bossBlade", "left");
