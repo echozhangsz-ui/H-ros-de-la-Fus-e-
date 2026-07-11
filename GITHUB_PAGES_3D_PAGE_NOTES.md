@@ -12,8 +12,9 @@
 2. 页面必须先用普通 HTML 或普通 `<script>` 渲染出可见卡片。
 3. Three.js 只能做增强：成功时覆盖成 WebGL 3D，失败时保留 CSS fallback。
 4. `#grid` 不能依赖 `import * as THREE from "./three.module.js"` 才出现内容。
-5. 发布前必须检查 GitHub Pages 公开链接，不只检查本地文件。
-6. 公开链接检查时要加版本参数，例如 `?v=commitHash`，避免浏览器缓存旧文件。
+5. CSS fallback 也必须支持拖动旋转，不能只把拖动逻辑写在 Three.js 模块里。
+6. 发布前必须检查 GitHub Pages 公开链接，不只检查本地文件。
+7. 公开链接检查时要加版本参数，例如 `?v=commitHash`，避免浏览器缓存旧文件。
 
 ## 当前页面结构
 
@@ -37,6 +38,7 @@
 - `#grid` 初始加载后必须有 6 个 `.card`
 - 每个 `.card` 必须有 `.fallback-model`
 - 每个 `.viewer` 必须有 `<canvas>` 和 `.fallback-model`
+- fallback 模式下拖动 `.viewer` 必须能改变 `.block-person` 的 `--fallback-rotation`
 - 不要写 `grid.innerHTML = ""` 后只依赖模块脚本重新生成
 - 不要删除普通脚本里的 `window.characterData`
 
@@ -54,6 +56,7 @@ node -e "/* start local static server */"
 - 手机尺寸能看到 6 张卡
 - DevTools Console 没有红色错误
 - WebGL 加载失败时仍能看到 CSS 方块角色
+- WebGL 加载失败时拖动角色框，CSS 方块角色仍能左右旋转
 
 GitHub Pages 验证：
 

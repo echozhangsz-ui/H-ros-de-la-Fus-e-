@@ -123,6 +123,7 @@ h1 {
   display: grid;
   place-items: end center;
   padding-bottom: 52px;
+  perspective: 760px;
   pointer-events: none;
 }
 
@@ -145,6 +146,7 @@ h1 {
   width: 170px;
   height: 240px;
   transform-origin: 50% 88%;
+  transform-style: preserve-3d;
   animation: css-walk .82s ease-in-out infinite;
 }
 
@@ -442,8 +444,8 @@ h1 {
 }
 
 @keyframes css-walk {
-  0%, 100% { transform: translateY(0) rotate(-1deg); }
-  50% { transform: translateY(-8px) rotate(1deg); }
+  0%, 100% { transform: translateY(0) rotateZ(-1deg) rotateY(var(--fallback-rotation, 0deg)); }
+  50% { transform: translateY(-8px) rotateZ(1deg) rotateY(var(--fallback-rotation, 0deg)); }
 }
 
 @keyframes css-arm-a {
@@ -543,6 +545,41 @@ h1 {
 
   var grid = document.getElementById("grid");
   grid.innerHTML = window.characterData.map(cardHtml).join("");
+
+  document.querySelectorAll(".viewer").forEach(function (viewer) {
+    var model = viewer.querySelector(".block-person");
+    var rotation = 0;
+    var dragging = false;
+    var lastX = 0;
+
+    function setRotation(value) {
+      rotation = value;
+      if (model) model.style.setProperty("--fallback-rotation", rotation + "deg");
+    }
+
+    viewer.addEventListener("pointerdown", function (event) {
+      dragging = true;
+      lastX = event.clientX;
+      viewer.classList.add("dragging");
+      if (viewer.setPointerCapture) viewer.setPointerCapture(event.pointerId);
+    });
+
+    viewer.addEventListener("pointermove", function (event) {
+      if (!dragging) return;
+      var delta = event.clientX - lastX;
+      lastX = event.clientX;
+      setRotation(rotation + delta * .75);
+    });
+
+    function endDrag() {
+      dragging = false;
+      viewer.classList.remove("dragging");
+    }
+
+    viewer.addEventListener("pointerup", endDrag);
+    viewer.addEventListener("pointercancel", endDrag);
+    viewer.addEventListener("lostpointercapture", endDrag);
+  });
 }());
 </script>
 
