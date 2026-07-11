@@ -442,6 +442,10 @@ h1 {
   background: var(--skin);
 }
 
+.julie-css .head {
+  border-radius: 10px 10px 4px 4px;
+}
+
 .boss-css .head {
   width: 78px;
   height: 76px;
@@ -509,6 +513,91 @@ h1 {
   height: 86px;
   margin-left: -58px;
   background: var(--shirt);
+}
+
+.julie-css .body {
+  width: 104px;
+  height: 90px;
+  margin-left: -52px;
+  background:
+    linear-gradient(90deg, transparent 18px, var(--pants) 18px 28px, transparent 28px 76px, var(--pants) 76px 86px, transparent 86px),
+    linear-gradient(180deg, transparent 0 22px, var(--pants) 22px 100%),
+    var(--shirt);
+}
+
+.julie-css .arm {
+  width: 28px;
+  height: 88px;
+  background: var(--hand);
+}
+
+.julie-css .leg {
+  width: 28px;
+  height: 72px;
+  background: var(--pants);
+}
+
+.julie-css .eye {
+  top: 46px;
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  background: var(--eyes);
+}
+
+.julie-css .mouth {
+  top: 70px;
+  width: 34px;
+  height: 5px;
+  background: var(--ink);
+}
+
+.antenna,
+.braid {
+  position: absolute;
+  left: 50%;
+  z-index: 5;
+  background: var(--ink);
+}
+
+.antenna {
+  top: -18px;
+  width: 5px;
+  height: 22px;
+  margin-left: -2px;
+}
+
+.antenna::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--eyes);
+}
+
+.braid {
+  top: 48px;
+  width: 9px;
+  height: 58px;
+  border-radius: 999px;
+  background: var(--hair);
+}
+
+.braid.left {
+  margin-left: -62px;
+  transform: rotate(18deg);
+  box-shadow: -8px 20px 0 var(--hair), -13px 40px 0 var(--hair);
+}
+
+.braid.right {
+  margin-left: 53px;
+  transform: rotate(-18deg);
+  box-shadow: 8px 20px 0 var(--hair), 13px 40px 0 var(--hair);
 }
 
 .boss-css .body {
@@ -794,7 +883,7 @@ h1 {
   window.characterData = [
     { id: "marc", name: "Marc", cssClass: "marc-css", role: "Player · Explorer · Rocket builder", desc: "主角，绿色方块头、白色上衣和粗壮方块四肢，先按真正 3D 方块体比例测试。", pv: "12", atk: "3+", speed: "Medium", tags: ["Player", "Tool", "Rocket"], skin: 0x69a78b, shirt: 0xf4f0e5, pants: 0xcfd5de, hair: 0x202020, hand: 0x4a8b70, eyes: 0x101010, mouth: "flat", weapon: "pickaxe", scale: 1 },
     { id: "davide", name: "Davide", cssClass: "davide-css angry-css", role: "Enemy · Fast · Sword", desc: "快速近战敌人，亮蓝色上衣、黑色腿、夸张扫发和凶狠眉眼，让他和其它绿色角色明显区分。", pv: "8", atk: "6+", speed: "Fast", tags: ["Enemy", "Sword", "Chase"], skin: 0x78a889, shirt: 0x1f78d1, pants: 0x171717, hair: 0x111111, hand: 0x4a8b70, eyes: 0x111111, mouth: "angry", weapon: "sword", scale: 1.03, forwardLean: true },
-    { id: "julie", name: "Julie Robot", cssClass: "robot-css smile", role: "Robot · Guard · Smooth", desc: "机器人角色，方形头和方块肩膀更宽，眼睛和关节带一点蓝色机械发光。", pv: "15", atk: "4+", speed: "Steady", tags: ["Robot", "Guard", "Resource"], skin: 0xc7cdd3, shirt: 0xb8c0c9, pants: 0xbfc5cc, hair: 0x7edbff, hand: 0x9da7b3, eyes: 0x213040, mouth: "smile", scale: 1, robot: true },
+    { id: "julie", name: "Julie Robot", cssClass: "robot-css julie-css", role: "Robot · Guard · Smooth", desc: "机器人女孩，灰色机身、蓝色背带裤、夸张双辫、头顶信号接收器、圆蓝眼和一字嘴。", pv: "15", atk: "4+", speed: "Steady", tags: ["Robot", "Guard", "Resource"], skin: 0x8c9297, shirt: 0x8d9398, pants: 0x2f9ee8, hair: 0x20272c, hand: 0x56c7f2, eyes: 0x62d9ff, mouth: "flat", scale: 1, robot: true },
     { id: "olivier", name: "Olivier", cssClass: "teeth-css", role: "Enemy · Ambush · High damage", desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。", pv: "7", atk: "7+", speed: "Quick", tags: ["Enemy", "Ambush", "Damage"], skin: 0x82b48b, shirt: 0xf1eee5, pants: 0xe3ddd3, hair: 0x171717, hand: 0x4f9474, eyes: 0x101010, mouth: "teeth", weapon: "club", scale: 1.04, forwardLean: true },
     { id: "zombie", name: "Zombie", cssClass: "", role: "Enemy · Common · Map patrol", desc: "普通世界敌人，灰绿皮肤、暗绿衣服和拖沓步态，用方块体型表现低速巡逻。", pv: "7", atk: "5", speed: "Slow", tags: ["Enemy", "Patrol", "Slow"], skin: 0x8fb07a, shirt: 0x556b46, pants: 0x3f4b39, hair: 0x713b3b, hand: 0x82a96f, eyes: 0x111111, mouth: "flat", scale: .98, zombie: true },
     { id: "boss", name: "Boss", cssClass: "boss-css teeth-css", role: "Final Boss · Volcano · Multi-arm", desc: "最终 Boss，按原画做成巨大方块身体、四条折臂、尖牙脸和两把长武器。", pv: "70", atk: "40", speed: "Heavy", tags: ["Boss", "Volcano", "Lava"], skin: 0xaec1b4, shirt: 0xf1eee5, pants: 0x222222, hair: 0x151515, hand: 0xaec1b4, eyes: 0x101010, mouth: "teeth", scale: 1.23, boss: true }
@@ -807,8 +896,9 @@ h1 {
   function faceHtml(config) {
     var teeth = config.mouth === "teeth" ? '<span class="tooth t1"></span><span class="tooth t2"></span><span class="tooth t3"></span><span class="tooth t4"></span>' : "";
     var spikes = (config.id === "olivier" || config.boss) ? '<span class="part spike s1"></span><span class="part spike s2"></span><span class="part spike s3"></span><span class="part spike s4"></span><span class="part spike s5"></span>' : "";
-    var core = config.robot ? '<span class="core"></span>' : "";
-    return spikes + '<span class="eye"></span><span class="eye right"></span><span class="mouth"></span>' + teeth + core;
+    var core = config.robot && config.id !== "julie" ? '<span class="core"></span>' : "";
+    var robotDetails = config.id === "julie" ? '<span class="antenna"></span><span class="braid left"></span><span class="braid right"></span>' : "";
+    return spikes + robotDetails + '<span class="eye"></span><span class="eye right"></span><span class="mouth"></span>' + teeth + core;
   }
 
   function weaponHtml(config) {
@@ -842,7 +932,7 @@ h1 {
   }
 
   function cardHtml(config) {
-    var style = "--skin:" + hex(config.skin) + ";--shirt:" + hex(config.shirt) + ";--pants:" + hex(config.pants) + ";--hair:" + hex(config.hair) + ";--hand:" + hex(config.hand) + ";--weapon:#7a5434;";
+    var style = "--skin:" + hex(config.skin) + ";--shirt:" + hex(config.shirt) + ";--pants:" + hex(config.pants) + ";--hair:" + hex(config.hair) + ";--hand:" + hex(config.hand) + ";--eyes:" + hex(config.eyes) + ";--weapon:#7a5434;";
     var extraArms = config.boss ? '<span class="part arm extra-left"></span><span class="part arm extra-right"></span>' : "";
     var fallback = config.id === "marc" ? marcFallbackHtml(style) :
       '<div class="block-person ' + config.cssClass + '" style="' + style + '">' +
@@ -938,9 +1028,25 @@ function pixel(parent, size, color, position) {
   return mesh;
 }
 
+function disk(parent, radius, depth, color, position) {
+  const geometry = new THREE.CylinderGeometry(radius, radius, depth, 24);
+  const mesh = new THREE.Mesh(geometry, mat(color, .58, .04));
+  mesh.position.set(position[0], position[1], position[2]);
+  mesh.rotation.x = Math.PI / 2;
+  mesh.castShadow = false;
+  parent.add(mesh);
+  return mesh;
+}
+
 function addFace(root, config, headY, headDepth) {
   const z = headDepth / 2 + .012;
   const eyeY = headY + (config.boss ? .05 : .03);
+  if (config.id === "julie") {
+    disk(root, .075, .035, config.eyes, [-.17, eyeY + .02, z + .008]);
+    disk(root, .075, .035, config.eyes, [.17, eyeY + .02, z + .008]);
+    pixel(root, [.34, .045, .038], 0x111111, [0, headY - .18, z + .004]);
+    return;
+  }
   pixel(root, [.13, .13, .035], config.eyes, [-.16, eyeY, z]);
   pixel(root, [.13, .13, .035], config.eyes, [.16, eyeY, z]);
 
@@ -972,6 +1078,25 @@ function addHair(root, config, headY, headSize) {
     block(root, [.62, .24, .18], config.hair, [-.26, topY - .03, .29], { rotation: [0, 0, -.48] });
     block(root, [.5, .14, .16], config.hair, [.28, topY - .02, .26], { rotation: [0, 0, .25] });
     block(root, [.18, .34, .14], config.hair, [-.42, topY + .02, .08], { rotation: [0, 0, -.3] });
+  }
+  if (config.id === "julie") {
+    block(root, [.07, .36, .07], 0x20272c, [0, topY + .2, 0]);
+    const receiver = new THREE.Mesh(new THREE.SphereGeometry(.12, 16, 12), mat(config.eyes, .55, .08));
+    receiver.position.set(0, topY + .42, 0);
+    receiver.castShadow = true;
+    root.add(receiver);
+    const leftBraid = new THREE.Group();
+    leftBraid.position.set(-.55, headY - .02, .02);
+    leftBraid.rotation.z = .32;
+    root.add(leftBraid);
+    const rightBraid = new THREE.Group();
+    rightBraid.position.set(.55, headY - .02, .02);
+    rightBraid.rotation.z = -.32;
+    root.add(rightBraid);
+    for (let i = 0; i < 4; i++) {
+      block(leftBraid, [.16, .18, .14], config.hair, [0, -.16 - i * .16, .02]);
+      block(rightBraid, [.16, .18, .14], config.hair, [0, -.16 - i * .16, .02]);
+    }
   }
   if (config.id === "olivier" || config.boss) {
     for (let i = 0; i < 5; i++) {
@@ -1030,9 +1155,18 @@ function buildBlockCharacter(config) {
   addFace(root, config, headY, headSize[2]);
 
   if (config.robot) {
-    pixel(root, [.08, .24, .04], 0x7edbff, [-.5, 1.3, .27]);
-    pixel(root, [.08, .24, .04], 0x7edbff, [.5, 1.3, .27]);
-    pixel(root, [.12, .12, .04], 0x7edbff, [0, 1.35, .28]);
+    if (config.id === "julie") {
+      const frontZ = bodySize[2] / 2 + .018;
+      pixel(root, [.52, .55, .045], config.pants, [0, bodyY - .12, frontZ]);
+      pixel(root, [.09, .76, .045], config.pants, [-.28, bodyY + .08, frontZ + .006]);
+      pixel(root, [.09, .76, .045], config.pants, [.28, bodyY + .08, frontZ + .006]);
+      pixel(root, [.16, .08, .045], 0xd8f6ff, [-.28, bodyY + .42, frontZ + .012]);
+      pixel(root, [.16, .08, .045], 0xd8f6ff, [.28, bodyY + .42, frontZ + .012]);
+    } else {
+      pixel(root, [.08, .24, .04], 0x7edbff, [-.5, 1.3, .27]);
+      pixel(root, [.08, .24, .04], 0x7edbff, [.5, 1.3, .27]);
+      pixel(root, [.12, .12, .04], 0x7edbff, [0, 1.35, .28]);
+    }
   }
   if (config.boss) {
     pixel(root, [.84, .12, .04], 0x111111, [0, 1.62, .28]);
