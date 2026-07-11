@@ -156,100 +156,105 @@ h1 {
   animation-duration: 1s;
 }
 
+.marc-css {
+  transform-style: flat;
+}
+
 .marc-css .part {
-  transform-style: preserve-3d;
+  box-shadow: inset -10px -8px 0 rgba(0,0,0,.14), 0 7px 12px rgba(0,0,0,.14);
 }
 
-.marc-css .head,
-.marc-css .body,
-.marc-css .arm,
-.marc-css .leg,
-.marc-css .hair {
-  transform: translateZ(28px);
-  backface-visibility: hidden;
+.marc-css.marc-side {
+  animation-name: css-side-walk;
 }
 
-.marc-css .part::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  right: -38px;
-  width: 38px;
-  height: calc(100% + 4px);
-  border: 2px solid rgba(20, 18, 14, .7);
-  background: var(--part-side, #777);
-  box-shadow: inset -12px -7px 0 rgba(0, 0, 0, .18);
-  transform-origin: left center;
-  transform: rotateY(90deg);
-  backface-visibility: visible;
-}
-
-.marc-css .part::after {
-  content: "";
-  position: absolute;
-  top: -38px;
-  left: -2px;
-  width: calc(100% + 4px);
-  height: 38px;
-  border: 2px solid rgba(20, 18, 14, .62);
-  background: var(--part-top, #999);
-  transform-origin: bottom center;
-  transform: rotateX(90deg);
-  backface-visibility: visible;
-}
-
-.marc-css .head::before {
-  --part-side: var(--skin);
+.marc-css.marc-side .head {
+  width: 46px;
+  height: 72px;
+  margin-left: -23px;
   background:
-    linear-gradient(180deg, transparent 0 38%, var(--ink) 38% 46%, transparent 46% 58%, var(--ink) 58% 65%, transparent 65% 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--skin) 88%, #fff), var(--skin));
+    linear-gradient(90deg, rgba(255,255,255,.12), transparent 42%),
+    var(--skin);
 }
 
-.marc-css .head::after {
-  --part-top: var(--hair);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--hair) 78%, #fff), var(--hair));
-}
-
-.marc-css .body::before {
-  --part-side: var(--shirt);
-  background:
-    linear-gradient(90deg, rgba(255,255,255,.2), transparent 34%),
-    color-mix(in srgb, var(--shirt) 84%, #806f4d);
-}
-
-.marc-css .body::after {
-  --part-top: var(--shirt);
-  background: color-mix(in srgb, var(--shirt) 88%, #fff);
-}
-
-.marc-css .arm::before {
-  --part-side: var(--hand);
-  background:
-    linear-gradient(90deg, rgba(255,255,255,.16), transparent 38%),
-    color-mix(in srgb, var(--hand) 82%, #193f33);
-}
-
-.marc-css .arm::after {
-  --part-top: var(--hand);
-  background: color-mix(in srgb, var(--hand) 86%, #fff);
-}
-
-.marc-css .leg::before {
-  --part-side: var(--pants);
-  background:
-    linear-gradient(90deg, rgba(255,255,255,.2), transparent 38%),
-    color-mix(in srgb, var(--pants) 78%, #556070);
-}
-
-.marc-css .leg::after {
-  --part-top: var(--pants);
-  background: color-mix(in srgb, var(--pants) 90%, #fff);
-}
-
-.marc-css .hair::before,
-.marc-css .hair::after {
+.marc-css.marc-side .hair {
+  width: 54px;
+  height: 13px;
+  margin-left: -27px;
   background: var(--hair);
+}
+
+.marc-css.marc-side .body {
+  top: 89px;
+  width: 44px;
+  height: 96px;
+  margin-left: -22px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.22), transparent 42%),
+    var(--shirt);
+}
+
+.marc-css.marc-side .arm {
+  top: 92px;
+  width: 34px;
+  height: 108px;
+  margin-left: -31px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.16), transparent 42%),
+    var(--hand);
+}
+
+.marc-css.marc-side .arm.right {
+  display: none;
+}
+
+.marc-css.marc-side .leg {
+  top: 182px;
+  width: 32px;
+  height: 66px;
+  margin-left: -17px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.2), transparent 42%),
+    var(--pants);
+}
+
+.marc-css.marc-side .leg.right {
+  display: none;
+}
+
+.marc-css.marc-side .eye {
+  top: 48px;
+  width: 8px;
+  height: 12px;
+  margin-left: -2px;
+}
+
+.marc-css.marc-side .eye.right {
+  display: none;
+}
+
+.marc-css.marc-side .mouth {
+  top: 72px;
+  width: 16px;
+  height: 5px;
+  margin-left: -8px;
+}
+
+.marc-css.marc-back .eye,
+.marc-css.marc-back .mouth {
+  display: none;
+}
+
+.marc-css.marc-back .head {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.12), transparent 22%, transparent 78%, rgba(0,0,0,.12)),
+    var(--skin);
+}
+
+.marc-css.marc-back .body {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.08), transparent 22%, transparent 78%, rgba(0,0,0,.1)),
+    var(--shirt);
 }
 
 .part {
@@ -545,6 +550,11 @@ h1 {
   50% { transform: translateY(-8px) rotateZ(1deg) rotateY(var(--fallback-rotation, 0deg)); }
 }
 
+@keyframes css-side-walk {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
 @keyframes css-arm-a {
   0%, 100% { transform: rotate(11deg); }
   50% { transform: rotate(-16deg); }
@@ -651,7 +661,15 @@ h1 {
 
     function setRotation(value) {
       rotation = value;
-      if (model) model.style.setProperty("--fallback-rotation", rotation + "deg");
+      if (!model) return;
+      model.style.setProperty("--fallback-rotation", rotation + "deg");
+      if (model.classList.contains("marc-css")) {
+        var normalized = ((rotation % 360) + 360) % 360;
+        var side = (normalized >= 45 && normalized <= 135) || (normalized >= 225 && normalized <= 315);
+        var back = normalized > 135 && normalized < 225;
+        model.classList.toggle("marc-side", side);
+        model.classList.toggle("marc-back", back);
+      }
     }
 
     viewer.addEventListener("pointerdown", function (event) {
