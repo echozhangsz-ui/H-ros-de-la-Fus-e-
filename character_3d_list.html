@@ -177,6 +177,7 @@ h1 {
   height: calc(100% + 4px);
   border: 2px solid rgba(20, 18, 14, .7);
   background: rgba(20, 18, 14, .2);
+  box-shadow: inset -7px -5px 0 rgba(0, 0, 0, .18);
   transform-origin: left center;
   transform: rotateY(90deg);
 }
@@ -192,6 +193,61 @@ h1 {
   background: rgba(255, 255, 255, .18);
   transform-origin: bottom center;
   transform: rotateX(90deg);
+}
+
+.marc-css .head::before {
+  background-color: var(--skin);
+  background:
+    linear-gradient(180deg, transparent 0 34%, var(--ink) 34% 45%, transparent 45% 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--skin) 82%, #fff), var(--skin));
+}
+
+.marc-css .head::after {
+  background-color: var(--hair);
+  background:
+    linear-gradient(90deg, var(--hair) 0 100%),
+    var(--skin);
+}
+
+.marc-css .body::before {
+  background-color: var(--shirt);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.34), transparent 34%),
+    color-mix(in srgb, var(--shirt) 84%, #806f4d);
+}
+
+.marc-css .body::after {
+  background-color: var(--shirt);
+  background: color-mix(in srgb, var(--shirt) 88%, #fff);
+}
+
+.marc-css .arm::before {
+  background-color: var(--hand);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.18), transparent 42%),
+    color-mix(in srgb, var(--hand) 82%, #193f33);
+}
+
+.marc-css .arm::after {
+  background-color: var(--hand);
+  background: color-mix(in srgb, var(--hand) 86%, #fff);
+}
+
+.marc-css .leg::before {
+  background-color: var(--pants);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.22), transparent 45%),
+    color-mix(in srgb, var(--pants) 78%, #556070);
+}
+
+.marc-css .leg::after {
+  background-color: var(--pants);
+  background: color-mix(in srgb, var(--pants) 90%, #fff);
+}
+
+.marc-css .hair::before,
+.marc-css .hair::after {
+  background: var(--hair);
 }
 
 .part {
