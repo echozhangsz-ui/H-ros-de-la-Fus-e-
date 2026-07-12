@@ -576,6 +576,9 @@ h1 {
   top: 86px;
   height: 124px;
   background:
+    radial-gradient(circle at 28% 18%, rgba(38, 76, 31, .5) 0 8px, transparent 9px),
+    radial-gradient(circle at 72% 40%, rgba(91, 132, 65, .42) 0 7px, transparent 8px),
+    radial-gradient(circle at 42% 72%, rgba(47, 83, 36, .46) 0 10px, transparent 11px),
     linear-gradient(90deg, rgba(30, 70, 28, .35), transparent 52%),
     var(--hand);
 }
@@ -1084,6 +1087,13 @@ function pixel(parent, size, color, position) {
   return mesh;
 }
 
+function zombiePatch(parent, size, color, position, rotation) {
+  const mesh = block(parent, size, color, position, { roughness: .86 });
+  mesh.castShadow = false;
+  if (rotation) mesh.rotation.set(rotation[0], rotation[1], rotation[2]);
+  return mesh;
+}
+
 function disk(parent, radius, depth, color, position) {
   const geometry = new THREE.CylinderGeometry(radius, radius, depth, 24);
   const mesh = new THREE.Mesh(geometry, mat(color, .58, .04));
@@ -1220,10 +1230,16 @@ function buildBlockCharacter(config) {
 
   if (config.zombie) {
     const headZ = headSize[2] / 2 + .018;
+    const headX = headSize[0] / 2 + .018;
     pixel(root, [.22, .18, .04], 0x4f7a3e, [-.2, headY + .22, headZ]);
     pixel(root, [.18, .16, .04], 0x86ad62, [.18, headY + .16, headZ + .004]);
     pixel(root, [.24, .2, .04], 0x567f42, [.23, headY - .04, headZ + .006]);
     pixel(root, [.16, .22, .04], 0x3f6335, [-.27, headY - .17, headZ + .004]);
+    zombiePatch(root, [.04, .2, .18], 0x456d37, [-headX, headY + .18, .12]);
+    zombiePatch(root, [.04, .16, .24], 0x86aa62, [headX, headY + .08, -.08]);
+    zombiePatch(root, [.04, .26, .16], 0x395c31, [headX, headY - .2, .16]);
+    zombiePatch(root, [.2, .18, .04], 0x4a733a, [-.19, headY + .12, -headZ]);
+    zombiePatch(root, [.16, .24, .04], 0x7da25a, [.2, headY - .14, -headZ - .004]);
     pixel(root, [.18, .16, .04], 0x3f6335, [-.62, 1.35, .16]);
     pixel(root, [.16, .2, .04], 0x79a25b, [.62, 1.22, .16]);
     pixel(root, [.16, .18, .04], 0x5d8449, [-.12, bodyY + .1, bodySize[2] / 2 + .018]);
@@ -1262,6 +1278,16 @@ function buildBlockCharacter(config) {
   if (config.zombie) {
     leftArm.rotation.x = -.75;
     rightArm.rotation.x = -.75;
+    const armFrontZ = armThickness / 2 + .018;
+    const armSideX = armThickness / 2 + .018;
+    zombiePatch(leftArm, [.16, .24, .04], 0x3f6b35, [0, -.24, armFrontZ]);
+    zombiePatch(leftArm, [.2, .18, .04], 0x83a85e, [0, -.62, armFrontZ + .004]);
+    zombiePatch(leftArm, [.04, .22, .16], 0x507c40, [-armSideX, -.42, -.04]);
+    zombiePatch(leftArm, [.04, .18, .2], 0x385f31, [armSideX, -.86, .02]);
+    zombiePatch(rightArm, [.18, .2, .04], 0x3b6632, [0, -.3, armFrontZ]);
+    zombiePatch(rightArm, [.14, .26, .04], 0x86aa61, [0, -.74, armFrontZ + .004]);
+    zombiePatch(rightArm, [.04, .2, .18], 0x527f40, [armSideX, -.5, -.05]);
+    zombiePatch(rightArm, [.04, .16, .22], 0x34592e, [-armSideX, -.95, .03]);
   }
   addWeapon(rightArm, config.weapon, "right");
 
