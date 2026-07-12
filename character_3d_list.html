@@ -552,6 +552,60 @@ h1 {
   background: var(--ink);
 }
 
+.zombie-css .head {
+  background:
+    radial-gradient(circle at 24% 20%, rgba(42, 82, 32, .55) 0 10px, transparent 11px),
+    radial-gradient(circle at 72% 35%, rgba(51, 91, 37, .48) 0 9px, transparent 10px),
+    radial-gradient(circle at 38% 78%, rgba(35, 68, 28, .5) 0 8px, transparent 9px),
+    linear-gradient(90deg, rgba(20, 55, 20, .35) 0 16px, transparent 16px 34px, rgba(36, 79, 30, .32) 34px 48px, transparent 48px),
+    linear-gradient(180deg, rgba(28, 74, 27, .28) 0 18px, transparent 18px 42px, rgba(27, 65, 24, .22) 42px 56px, transparent 56px),
+    var(--skin);
+}
+
+.zombie-css .hair {
+  display: none;
+}
+
+.zombie-css .body {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.1) 0 18px, transparent 18px 58px, rgba(0,0,0,.12) 58px),
+    var(--shirt);
+}
+
+.zombie-css .arm {
+  background:
+    linear-gradient(90deg, rgba(30, 70, 28, .35), transparent 52%),
+    var(--hand);
+}
+
+.zombie-css .leg {
+  background:
+    linear-gradient(180deg, transparent 0 34px, rgba(20, 31, 92, .22) 34px 46px, transparent 46px),
+    var(--pants);
+}
+
+.zombie-css .eye {
+  top: 45px;
+  width: 19px;
+  height: 8px;
+  margin-left: -24px;
+  background: #111;
+}
+
+.zombie-css .eye.right {
+  margin-left: 7px;
+}
+
+.zombie-css .mouth {
+  top: 66px;
+  width: 42px;
+  height: 10px;
+  margin-left: -21px;
+  border-bottom: 4px solid #111;
+  background: transparent;
+  transform: skewX(-10deg);
+}
+
 .antenna,
 .braid {
   position: absolute;
@@ -885,7 +939,7 @@ h1 {
     { id: "davide", name: "Davide", cssClass: "davide-css angry-css", role: "Enemy · Fast · Sword", desc: "快速近战敌人，亮蓝色上衣、黑色腿、夸张扫发和凶狠眉眼，让他和其它绿色角色明显区分。", pv: "8", atk: "6+", speed: "Fast", tags: ["Enemy", "Sword", "Chase"], skin: 0x78a889, shirt: 0x1f78d1, pants: 0x171717, hair: 0x111111, hand: 0x4a8b70, eyes: 0x111111, mouth: "angry", weapon: "sword", scale: 1.03, forwardLean: true },
     { id: "julie", name: "Julie Robot", cssClass: "robot-css julie-css", role: "Robot · Guard · Smooth", desc: "机器人女孩，灰色机身、蓝色背带裤、夸张双辫、头顶信号接收器、圆蓝眼和一字嘴。", pv: "15", atk: "4+", speed: "Steady", tags: ["Robot", "Guard", "Resource"], skin: 0x8c9297, shirt: 0x8d9398, pants: 0x2f9ee8, hair: 0x20272c, hand: 0x56c7f2, eyes: 0x62d9ff, mouth: "flat", scale: 1, robot: true },
     { id: "olivier", name: "Olivier", cssClass: "teeth-css", role: "Enemy · Ambush · High damage", desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。", pv: "7", atk: "7+", speed: "Quick", tags: ["Enemy", "Ambush", "Damage"], skin: 0x82b48b, shirt: 0xf1eee5, pants: 0xe3ddd3, hair: 0x171717, hand: 0x4f9474, eyes: 0x101010, mouth: "teeth", weapon: "club", scale: 1.04, forwardLean: true },
-    { id: "zombie", name: "Zombie", cssClass: "", role: "Enemy · Common · Map patrol", desc: "普通世界敌人，灰绿皮肤、暗绿衣服和拖沓步态，用方块体型表现低速巡逻。", pv: "7", atk: "5", speed: "Slow", tags: ["Enemy", "Patrol", "Slow"], skin: 0x8fb07a, shirt: 0x556b46, pants: 0x3f4b39, hair: 0x713b3b, hand: 0x82a96f, eyes: 0x111111, mouth: "flat", scale: .98, zombie: true },
+    { id: "zombie", name: "Zombie", cssClass: "zombie-css", role: "Enemy · Common · Map patrol", desc: "Minecraft 风格僵尸，去掉帽子，脏绿色皮肤、长黑眼、咧嘴、棕色 T 恤和蓝色裤子。", pv: "7", atk: "5", speed: "Slow", tags: ["Enemy", "Patrol", "Slow"], skin: 0x6f9b58, shirt: 0x7a4f2e, pants: 0x3830a0, hair: 0x6f9b58, hand: 0x638b4f, eyes: 0x111111, mouth: "zombie", scale: .98, zombie: true },
     { id: "boss", name: "Boss", cssClass: "boss-css teeth-css", role: "Final Boss · Volcano · Multi-arm", desc: "最终 Boss，按原画做成巨大方块身体、四条折臂、尖牙脸和两把长武器。", pv: "70", atk: "40", speed: "Heavy", tags: ["Boss", "Volcano", "Lava"], skin: 0xaec1b4, shirt: 0xf1eee5, pants: 0x222222, hair: 0x151515, hand: 0xaec1b4, eyes: 0x101010, mouth: "teeth", scale: 1.23, boss: true }
   ];
 
@@ -1047,6 +1101,14 @@ function addFace(root, config, headY, headDepth) {
     pixel(root, [.34, .045, .038], 0x111111, [0, headY - .18, z + .004]);
     return;
   }
+  if (config.zombie) {
+    pixel(root, [.22, .075, .04], 0x111111, [-.18, eyeY + .02, z + .006]);
+    pixel(root, [.22, .075, .04], 0x111111, [.18, eyeY + .02, z + .006]);
+    pixel(root, [.46, .075, .04], 0x172015, [0, headY - .18, z + .004]);
+    pixel(root, [.1, .07, .042], 0x4f7744, [-.19, headY - .14, z + .01]);
+    pixel(root, [.1, .07, .042], 0x4f7744, [.04, headY - .16, z + .01]);
+    return;
+  }
   pixel(root, [.13, .13, .035], config.eyes, [-.16, eyeY, z]);
   pixel(root, [.13, .13, .035], config.eyes, [.16, eyeY, z]);
 
@@ -1072,7 +1134,7 @@ function addFace(root, config, headY, headDepth) {
 function addHair(root, config, headY, headSize) {
   const topY = headY + headSize[1] / 2 + .04;
   const hairDepth = config.id === "marc" ? headSize[2] + .12 : headSize[2] + .05;
-  block(root, [headSize[0] + .06, .12, hairDepth], config.hair, [0, topY, 0]);
+  if (!config.zombie) block(root, [headSize[0] + .06, .12, hairDepth], config.hair, [0, topY, 0]);
   if (config.id === "davide") {
     block(root, [.96, .16, hairDepth + .08], config.hair, [-.08, topY + .02, .01], { rotation: [0, 0, -.16] });
     block(root, [.62, .24, .18], config.hair, [-.26, topY - .03, .29], { rotation: [0, 0, -.48] });
@@ -1153,6 +1215,17 @@ function buildBlockCharacter(config) {
   const head = block(root, headSize, config.skin, [0, headY, 0]);
   addHair(root, config, headY, headSize);
   addFace(root, config, headY, headSize[2]);
+
+  if (config.zombie) {
+    const headZ = headSize[2] / 2 + .018;
+    pixel(root, [.22, .18, .04], 0x4f7a3e, [-.2, headY + .22, headZ]);
+    pixel(root, [.18, .16, .04], 0x86ad62, [.18, headY + .16, headZ + .004]);
+    pixel(root, [.24, .2, .04], 0x567f42, [.23, headY - .04, headZ + .006]);
+    pixel(root, [.16, .22, .04], 0x3f6335, [-.27, headY - .17, headZ + .004]);
+    pixel(root, [.18, .16, .04], 0x3f6335, [-.62, 1.35, .16]);
+    pixel(root, [.16, .2, .04], 0x79a25b, [.62, 1.22, .16]);
+    pixel(root, [.16, .18, .04], 0x5d8449, [-.12, bodyY + .1, bodySize[2] / 2 + .018]);
+  }
 
   if (config.robot) {
     if (config.id === "julie") {
