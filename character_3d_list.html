@@ -573,6 +573,8 @@ h1 {
 }
 
 .zombie-css .arm {
+  top: 86px;
+  height: 124px;
   background:
     linear-gradient(90deg, rgba(30, 70, 28, .35), transparent 52%),
     var(--hand);
@@ -1246,12 +1248,13 @@ function buildBlockCharacter(config) {
     pixel(root, [.65, .06, .04], 0x111111, [0, 1.4, .28]);
   }
 
-  const armLength = config.boss ? 1.02 : .92;
+  const armLength = config.boss ? 1.02 : config.zombie ? 1.22 : .92;
   const legLength = config.boss ? .86 : .82;
   const armThickness = config.boss ? .34 : isMarc ? .46 : config.robot ? .31 : .3;
   const legThickness = config.boss ? .36 : isMarc ? .44 : .32;
-  const leftArm = makeLimb(root, config, "left", "arm", config.boss ? 1.72 : 1.65, armLength, armThickness);
-  const rightArm = makeLimb(root, config, "right", "arm", config.boss ? 1.72 : 1.65, armLength, armThickness);
+  const armY = config.boss ? 1.72 : config.zombie ? 1.76 : 1.65;
+  const leftArm = makeLimb(root, config, "left", "arm", armY, armLength, armThickness);
+  const rightArm = makeLimb(root, config, "right", "arm", armY, armLength, armThickness);
   const leftLeg = makeLimb(root, config, "left", "leg", .84, legLength, legThickness);
   const rightLeg = makeLimb(root, config, "right", "leg", .84, legLength, legThickness);
   leftLeg.position.x = config.boss ? -.32 : isMarc ? -.27 : -.24;
