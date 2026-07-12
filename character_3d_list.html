@@ -1021,6 +1021,8 @@ h1 {
     var rotation = 0;
     var dragging = false;
     var lastX = 0;
+    var lastY = 0;
+    var dragMode = "";
 
     function setRotation(value) {
       rotation = value;
@@ -1038,6 +1040,8 @@ h1 {
     viewer.addEventListener("pointerdown", function (event) {
       dragging = true;
       lastX = event.clientX;
+      lastY = event.clientY;
+      dragMode = "";
       viewer.classList.add("dragging");
       if (viewer.setPointerCapture) viewer.setPointerCapture(event.pointerId);
     });
@@ -1045,12 +1049,23 @@ h1 {
     viewer.addEventListener("pointermove", function (event) {
       if (!dragging) return;
       var delta = event.clientX - lastX;
+      var deltaY = event.clientY - lastY;
       lastX = event.clientX;
+      lastY = event.clientY;
+      if (!dragMode) {
+        if (Math.abs(delta) < 4 && Math.abs(deltaY) < 4) return;
+        dragMode = Math.abs(deltaY) > Math.abs(delta) ? "scroll" : "rotate";
+      }
+      if (dragMode === "scroll") {
+        window.scrollBy(0, -deltaY);
+        return;
+      }
       setRotation(rotation + delta * .75);
     });
 
     function endDrag() {
       dragging = false;
+      dragMode = "";
       viewer.classList.remove("dragging");
     }
 
@@ -1379,17 +1394,30 @@ function attachDrag(viewer, entry) {
     viewer.classList.add("dragging");
     entry.dragging = true;
     entry.lastX = event.clientX;
+    entry.lastY = event.clientY;
+    entry.dragMode = "";
     viewer.setPointerCapture?.(event.pointerId);
   });
   viewer.addEventListener("pointermove", event => {
     if (!entry.dragging) return;
     const delta = event.clientX - entry.lastX;
+    const deltaY = event.clientY - entry.lastY;
     entry.lastX = event.clientX;
+    entry.lastY = event.clientY;
+    if (!entry.dragMode) {
+      if (Math.abs(delta) < 4 && Math.abs(deltaY) < 4) return;
+      entry.dragMode = Math.abs(deltaY) > Math.abs(delta) ? "scroll" : "rotate";
+    }
+    if (entry.dragMode === "scroll") {
+      window.scrollBy(0, -deltaY);
+      return;
+    }
     entry.targetRotation += delta * .012;
   });
   const end = () => {
     viewer.classList.remove("dragging");
     entry.dragging = false;
+    entry.dragMode = "";
   };
   viewer.addEventListener("pointerup", end);
   viewer.addEventListener("pointercancel", end);
