@@ -703,13 +703,13 @@ h1 {
 
 .boss-css .arm.extra-left {
   top: 132px;
-  margin-left: -138px;
+  margin-left: -166px;
   transform: rotate(28deg);
 }
 
 .boss-css .arm.extra-right {
   top: 132px;
-  margin-left: 104px;
+  margin-left: 132px;
   transform: rotate(-28deg);
 }
 
@@ -954,7 +954,7 @@ h1 {
     { id: "julie", name: "Julie Robot", cssClass: "robot-css julie-css", role: "Robot · Guard · Smooth", desc: "机器人女孩，灰色机身、蓝色背带裤、夸张双辫、头顶信号接收器、圆蓝眼和一字嘴。", pv: "15", atk: "4+", speed: "Steady", tags: ["Robot", "Guard", "Resource"], skin: 0x8c9297, shirt: 0x8d9398, pants: 0x2f9ee8, hair: 0x20272c, hand: 0x56c7f2, eyes: 0x62d9ff, mouth: "flat", scale: 1, robot: true },
     { id: "olivier", name: "Olivier", cssClass: "teeth-css", role: "Enemy · Ambush · High damage", desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。", pv: "7", atk: "7+", speed: "Quick", tags: ["Enemy", "Ambush", "Damage"], skin: 0x82b48b, shirt: 0xf1eee5, pants: 0xe3ddd3, hair: 0x171717, hand: 0x4f9474, eyes: 0x101010, mouth: "teeth", weapon: "club", scale: 1.04, forwardLean: true },
     { id: "zombie", name: "Zombie", cssClass: "zombie-css", role: "Enemy · Common · Map patrol", desc: "Minecraft 风格僵尸，去掉帽子，脏绿色皮肤、长黑眼、咧嘴、棕色 T 恤和脏绿色腿部。", pv: "7", atk: "5", speed: "Slow", tags: ["Enemy", "Patrol", "Slow"], skin: 0x6f9b58, shirt: 0x7a4f2e, pants: 0x638b4f, hair: 0x6f9b58, hand: 0x638b4f, eyes: 0x111111, mouth: "zombie", scale: .98, zombie: true },
-    { id: "boss", name: "Boss", cssClass: "boss-css teeth-css", role: "Final Boss · Volcano · Multi-arm", desc: "最终 Boss，按原画做成巨大方块身体、四条折臂、尖牙脸和两把长武器。", pv: "70", atk: "40", speed: "Heavy", tags: ["Boss", "Volcano", "Lava"], skin: 0xaec1b4, shirt: 0xf1eee5, pants: 0x222222, hair: 0x151515, hand: 0xaec1b4, eyes: 0x101010, mouth: "teeth", scale: 1.23, boss: true }
+    { id: "boss", name: "Boss", cssClass: "boss-css teeth-css", role: "Final Boss · Volcano · Multi-arm", desc: "最终 Boss，按原画做成巨大方块身体、四条分开的折臂和尖牙脸。", pv: "70", atk: "40", speed: "Heavy", tags: ["Boss", "Volcano", "Lava"], skin: 0xaec1b4, shirt: 0xf1eee5, pants: 0x222222, hair: 0x151515, hand: 0xaec1b4, eyes: 0x101010, mouth: "teeth", scale: 1.23, boss: true }
   ];
 
   function hex(color) {
@@ -1330,8 +1330,8 @@ function buildBlockCharacter(config) {
   if (config.boss) {
     extraLeft = makeLimb(root, config, "left", "arm", 1.36, 1.08, .3);
     extraRight = makeLimb(root, config, "right", "arm", 1.36, 1.08, .3);
-    extraLeft.position.x = -.9;
-    extraRight.position.x = .9;
+    extraLeft.position.x = -1.16;
+    extraRight.position.x = 1.16;
   }
 
   return { root, parts: { body, head, leftArm, rightArm, leftLeg, rightLeg, extraLeft, extraRight }, config };
