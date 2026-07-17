@@ -986,7 +986,6 @@ h1 {
       cubeHtml("body") +
       cubeHtml("arm-left") + cubeHtml("arm-right") +
       cubeHtml("head", face) + cubeHtml("hair") +
-      cubeHtml("tool") +
     '</div>';
   }
 
@@ -997,7 +996,7 @@ h1 {
       '<div class="block-person ' + config.cssClass + '" style="' + style + '">' +
         '<span class="part leg"></span><span class="part leg right"></span>' +
         '<span class="part body"></span><span class="part arm"></span><span class="part arm right"></span>' + extraArms +
-        '<span class="part head"></span><span class="part hair"></span>' + faceHtml(config) + weaponHtml(config) +
+        '<span class="part head"></span><span class="part hair"></span>' + faceHtml(config) +
       '</div>';
     return '<article class="card" data-id="' + config.id + '">' +
       '<div class="viewer" data-id="' + config.id + '">' +
@@ -1304,7 +1303,7 @@ function buildBlockCharacter(config) {
     zombiePatch(rightArm, [.04, .2, .18], 0x527f40, [armSideX, -.5, -.05]);
     zombiePatch(rightArm, [.04, .16, .22], 0x34592e, [-armSideX, -.95, .03]);
   }
-  addWeapon(rightArm, config.weapon, "right");
+  // Character list view intentionally shows characters without handheld weapons.
 
   let extraLeft = null;
   let extraRight = null;
@@ -1313,10 +1312,6 @@ function buildBlockCharacter(config) {
     extraRight = makeLimb(root, config, "right", "arm", 1.36, 1.08, .3);
     extraLeft.position.x = -.9;
     extraRight.position.x = .9;
-    addWeapon(leftArm, "bossBlade", "left");
-    addWeapon(rightArm, "bossBlade", "right");
-    addWeapon(extraLeft, "bossBlade", "left");
-    addWeapon(extraRight, "bossBlade", "right");
   }
 
   return { root, parts: { body, head, leftArm, rightArm, leftLeg, rightLeg, extraLeft, extraRight }, config };
