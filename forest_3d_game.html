@@ -52,7 +52,6 @@ canvas {
   top: 14px;
   display: grid;
   gap: 8px;
-  min-width: 230px;
 }
 
 .panel {
@@ -62,7 +61,10 @@ canvas {
 }
 
 .health-panel {
-  padding: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .hearts {
@@ -94,12 +96,6 @@ canvas {
   background: linear-gradient(90deg, #e23b32, #ff7d42);
 }
 
-.hint {
-  padding: 9px 10px;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
 .bag-button {
   position: absolute;
   left: 14px;
@@ -122,17 +118,6 @@ canvas {
   line-height: 1;
 }
 
-.action-pad {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  pointer-events: auto;
-}
-
-.action-pad button,
 .modal button,
 .game-over button {
   border: 3px solid var(--line);
@@ -285,15 +270,6 @@ canvas {
 }
 
 @media (max-width: 720px) {
-  .top-left {
-    min-width: 190px;
-    right: 14px;
-  }
-
-  .hint {
-    display: none;
-  }
-
   .bag-button {
     width: 74px;
     height: 58px;
@@ -305,18 +281,13 @@ canvas {
 <div id="game"></div>
 <div class="hud">
   <div class="top-left">
-    <div class="panel health-panel">
+    <div class="health-panel">
       <div class="hearts" id="hearts"></div>
       <div class="bar"><div class="bar-fill" id="playerHpBar"></div></div>
     </div>
-    <div class="panel hint">WASD / Arrows move · E collect · Space attack<br>Collect drops by walking over them.</div>
   </div>
   <div class="panel toast" id="toast">Need to get closer</div>
   <button class="bag-button" id="bagButton" type="button"><strong>Bag</strong>Items</button>
-  <div class="action-pad">
-    <button id="gatherButton" type="button">Gather</button>
-    <button id="attackButton" type="button">Attack</button>
-  </div>
 </div>
 
 <div class="modal-backdrop" id="inventoryModal">
@@ -357,8 +328,6 @@ const closeInventory = document.getElementById("closeInventory");
 const gameOverEl = document.getElementById("gameOver");
 const playAgain = document.getElementById("playAgain");
 const toast = document.getElementById("toast");
-const gatherButton = document.getElementById("gatherButton");
-const attackButton = document.getElementById("attackButton");
 
 const RESOURCE_META = {
   wood: { label: "Wood", color: 0x7a4f2e },
@@ -377,6 +346,13 @@ const state = {
   fragments: [],
   enemyLabels: [],
   keys: new Set(),
+  moveTarget: null,
+  cameraYaw: Math.PI / 4,
+  cameraPitch: .82,
+  pointerDown: false,
+  pointerMoved: false,
+  pointerStart: { x: 0, y: 0 },
+  pointerLast: { x: 0, y: 0 },
   gameOver: false,
   attackCooldown: 0,
   gatherCooldown: 0,
@@ -429,6 +405,7 @@ function block(parent, size, color, position, options = {}) {
 function makeGround() {
   const ground = block(scene, [34, .35, 34], 0x5f8d45, [0, -.18, 0], { roughness: .92 });
   ground.castShadow = false;
+  state.ground = ground;
 
   for (let x = -15; x <= 15; x += 2) {
     for (let z = -15; z <= 15; z += 2) {
@@ -631,7 +608,7 @@ function flyToBag(type, worldPosition) {
   setTimeout(() => el.remove(), 620);
 }
 
-function gather() {
+function gather(showMessage = true) {
   if (state.gameOver || state.gatherCooldown > 0) return;
   state.gatherCooldown = .35;
   let target = null;
@@ -645,7 +622,7 @@ function gather() {
     }
   }
   if (!target) {
-    showToast("Get closer to a resource");
+    if (showMessage) showToast("Get closer to a resource");
     return;
   }
   target.hp -= 1;
@@ -660,7 +637,18 @@ function gather() {
   }
 }
 
-function attack() {
+function updateAutoGather() {
+  if (state.gatherCooldown > 0) return;
+  for (const node of state.nodes) {
+    if (node.dead) continue;
+    if (node.group.position.distanceTo(player.root.position) < node.radius + 1.05) {
+      gather(false);
+      return;
+    }
+  }
+}
+
+function attack(showMessage = true) {
   if (state.gameOver || state.attackCooldown > 0) return;
   state.attackCooldown = .42;
   let hit = false;
@@ -674,7 +662,7 @@ function attack() {
       if (enemy.hp <= 0) killEnemy(enemy);
     }
   }
-  if (!hit) showToast("No enemy in range");
+  if (!hit && showMessage) showToast("No enemy in range");
 }
 
 function killEnemy(enemy) {
@@ -690,6 +678,15 @@ function updatePlayer(dt, elapsed) {
   if (state.keys.has("KeyS") || state.keys.has("ArrowDown")) dir.z += 1;
   if (state.keys.has("KeyA") || state.keys.has("ArrowLeft")) dir.x -= 1;
   if (state.keys.has("KeyD") || state.keys.has("ArrowRight")) dir.x += 1;
+  if (state.moveTarget) {
+    const toTarget = state.moveTarget.clone().sub(player.root.position);
+    toTarget.y = 0;
+    if (toTarget.length() < .18) {
+      state.moveTarget = null;
+    } else {
+      dir.copy(toTarget.normalize());
+    }
+  }
   if (dir.lengthSq() > 0) {
     dir.normalize();
     player.root.position.addScaledVector(dir, dt * 4.2);
@@ -807,9 +804,38 @@ function updateFragments(dt) {
 
 function updateCamera() {
   const target = player.root.position.clone();
-  const desired = target.clone().add(new THREE.Vector3(0, 9, 9));
+  const distance = 12;
+  const horizontal = Math.cos(state.cameraPitch) * distance;
+  const desired = target.clone().add(new THREE.Vector3(
+    Math.sin(state.cameraYaw) * horizontal,
+    Math.sin(state.cameraPitch) * distance,
+    Math.cos(state.cameraYaw) * horizontal
+  ));
   camera.position.lerp(desired, .08);
   camera.lookAt(target.x, 1.05, target.z);
+}
+
+function screenToGround(clientX, clientY) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  const pointer = new THREE.Vector2(
+    ((clientX - rect.left) / rect.width) * 2 - 1,
+    -((clientY - rect.top) / rect.height) * 2 + 1
+  );
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObject(state.ground);
+  return hits[0]?.point || null;
+}
+
+function handlePointerClick(event) {
+  if (state.gameOver) return;
+  attack(false);
+  const point = screenToGround(event.clientX, event.clientY);
+  if (point) {
+    point.x = THREE.MathUtils.clamp(point.x, -15.5, 15.5);
+    point.z = THREE.MathUtils.clamp(point.z, -15.5, 15.5);
+    point.y = 0;
+    state.moveTarget = point;
+  }
 }
 
 function endGame() {
@@ -828,16 +854,49 @@ function resize() {
 window.addEventListener("resize", resize);
 window.addEventListener("keydown", event => {
   state.keys.add(event.code);
-  if (event.code === "KeyE") gather();
-  if (event.code === "Space") {
-    event.preventDefault();
-    attack();
-  }
 });
 window.addEventListener("keyup", event => state.keys.delete(event.code));
 
-gatherButton.addEventListener("click", gather);
-attackButton.addEventListener("click", attack);
+renderer.domElement.addEventListener("pointerdown", event => {
+  if (event.button !== 0) return;
+  state.pointerDown = true;
+  state.pointerMoved = false;
+  state.pointerStart.x = event.clientX;
+  state.pointerStart.y = event.clientY;
+  state.pointerLast.x = event.clientX;
+  state.pointerLast.y = event.clientY;
+  renderer.domElement.setPointerCapture?.(event.pointerId);
+});
+
+renderer.domElement.addEventListener("pointermove", event => {
+  if (!state.pointerDown) return;
+  const dx = event.clientX - state.pointerLast.x;
+  const dy = event.clientY - state.pointerLast.y;
+  state.pointerLast.x = event.clientX;
+  state.pointerLast.y = event.clientY;
+  if (Math.hypot(event.clientX - state.pointerStart.x, event.clientY - state.pointerStart.y) > 4) {
+    state.pointerMoved = true;
+  }
+  if (state.pointerMoved) {
+    state.cameraYaw -= dx * .006;
+    state.cameraPitch = THREE.MathUtils.clamp(state.cameraPitch + dy * .004, .42, 1.2);
+  }
+});
+
+renderer.domElement.addEventListener("pointerup", event => {
+  if (event.button !== 0) return;
+  renderer.domElement.releasePointerCapture?.(event.pointerId);
+  const wasDrag = state.pointerMoved;
+  state.pointerDown = false;
+  state.pointerMoved = false;
+  if (!wasDrag) handlePointerClick(event);
+});
+
+renderer.domElement.addEventListener("pointercancel", () => {
+  state.pointerDown = false;
+  state.pointerMoved = false;
+});
+
 bagButton.addEventListener("click", () => {
   updateInventoryUi();
   inventoryModal.classList.add("open");
@@ -856,6 +915,7 @@ function tick() {
     state.gatherCooldown = Math.max(0, state.gatherCooldown - dt);
     state.playerHitCooldown = Math.max(0, state.playerHitCooldown - dt);
     updatePlayer(dt, elapsed);
+    updateAutoGather();
     updateDrops(dt);
     updateEnemies(dt, elapsed);
     updateFragments(dt);
