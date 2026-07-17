@@ -585,7 +585,10 @@ h1 {
 
 .zombie-css .leg {
   background:
-    linear-gradient(180deg, transparent 0 34px, rgba(20, 31, 92, .22) 34px 46px, transparent 46px),
+    radial-gradient(circle at 28% 22%, rgba(38, 76, 31, .48) 0 7px, transparent 8px),
+    radial-gradient(circle at 72% 48%, rgba(91, 132, 65, .4) 0 8px, transparent 9px),
+    radial-gradient(circle at 38% 78%, rgba(47, 83, 36, .5) 0 9px, transparent 10px),
+    linear-gradient(90deg, rgba(30, 70, 28, .35), transparent 52%),
     var(--pants);
 }
 
@@ -944,7 +947,7 @@ h1 {
     { id: "davide", name: "Davide", cssClass: "davide-css angry-css", role: "Enemy · Fast · Sword", desc: "快速近战敌人，亮蓝色上衣、黑色腿、夸张扫发和凶狠眉眼，让他和其它绿色角色明显区分。", pv: "8", atk: "6+", speed: "Fast", tags: ["Enemy", "Sword", "Chase"], skin: 0x78a889, shirt: 0x1f78d1, pants: 0x171717, hair: 0x111111, hand: 0x4a8b70, eyes: 0x111111, mouth: "angry", weapon: "sword", scale: 1.03, forwardLean: true },
     { id: "julie", name: "Julie Robot", cssClass: "robot-css julie-css", role: "Robot · Guard · Smooth", desc: "机器人女孩，灰色机身、蓝色背带裤、夸张双辫、头顶信号接收器、圆蓝眼和一字嘴。", pv: "15", atk: "4+", speed: "Steady", tags: ["Robot", "Guard", "Resource"], skin: 0x8c9297, shirt: 0x8d9398, pants: 0x2f9ee8, hair: 0x20272c, hand: 0x56c7f2, eyes: 0x62d9ff, mouth: "flat", scale: 1, robot: true },
     { id: "olivier", name: "Olivier", cssClass: "teeth-css", role: "Enemy · Ambush · High damage", desc: "伏击敌人，绿色怪物脸、黑发和锯齿嘴，外形更接近原设计图中的可怕表情。", pv: "7", atk: "7+", speed: "Quick", tags: ["Enemy", "Ambush", "Damage"], skin: 0x82b48b, shirt: 0xf1eee5, pants: 0xe3ddd3, hair: 0x171717, hand: 0x4f9474, eyes: 0x101010, mouth: "teeth", weapon: "club", scale: 1.04, forwardLean: true },
-    { id: "zombie", name: "Zombie", cssClass: "zombie-css", role: "Enemy · Common · Map patrol", desc: "Minecraft 风格僵尸，去掉帽子，脏绿色皮肤、长黑眼、咧嘴、棕色 T 恤和蓝色裤子。", pv: "7", atk: "5", speed: "Slow", tags: ["Enemy", "Patrol", "Slow"], skin: 0x6f9b58, shirt: 0x7a4f2e, pants: 0x3830a0, hair: 0x6f9b58, hand: 0x638b4f, eyes: 0x111111, mouth: "zombie", scale: .98, zombie: true },
+    { id: "zombie", name: "Zombie", cssClass: "zombie-css", role: "Enemy · Common · Map patrol", desc: "Minecraft 风格僵尸，去掉帽子，脏绿色皮肤、长黑眼、咧嘴、棕色 T 恤和脏绿色腿部。", pv: "7", atk: "5", speed: "Slow", tags: ["Enemy", "Patrol", "Slow"], skin: 0x6f9b58, shirt: 0x7a4f2e, pants: 0x638b4f, hair: 0x6f9b58, hand: 0x638b4f, eyes: 0x111111, mouth: "zombie", scale: .98, zombie: true },
     { id: "boss", name: "Boss", cssClass: "boss-css teeth-css", role: "Final Boss · Volcano · Multi-arm", desc: "最终 Boss，按原画做成巨大方块身体、四条折臂、尖牙脸和两把长武器。", pv: "70", atk: "40", speed: "Heavy", tags: ["Boss", "Volcano", "Lava"], skin: 0xaec1b4, shirt: 0xf1eee5, pants: 0x222222, hair: 0x151515, hand: 0xaec1b4, eyes: 0x101010, mouth: "teeth", scale: 1.23, boss: true }
   ];
 
@@ -1302,6 +1305,14 @@ function buildBlockCharacter(config) {
     zombiePatch(rightArm, [.14, .26, .04], 0x86aa61, [0, -.74, armFrontZ + .004]);
     zombiePatch(rightArm, [.04, .2, .18], 0x527f40, [armSideX, -.5, -.05]);
     zombiePatch(rightArm, [.04, .16, .22], 0x34592e, [-armSideX, -.95, .03]);
+    const legFrontZ = legThickness / 2 + .018;
+    const legSideX = legThickness / 2 + .018;
+    zombiePatch(leftLeg, [.16, .18, .04], 0x3f6b35, [0, -.28, legFrontZ]);
+    zombiePatch(leftLeg, [.2, .16, .04], 0x83a85e, [0, -.58, legFrontZ + .004]);
+    zombiePatch(leftLeg, [.04, .18, .16], 0x507c40, [-legSideX, -.46, -.03]);
+    zombiePatch(rightLeg, [.18, .22, .04], 0x3b6632, [0, -.34, legFrontZ]);
+    zombiePatch(rightLeg, [.14, .18, .04], 0x86aa61, [0, -.66, legFrontZ + .004]);
+    zombiePatch(rightLeg, [.04, .2, .18], 0x34592e, [legSideX, -.5, .02]);
   }
   // Character list view intentionally shows characters without handheld weapons.
 
