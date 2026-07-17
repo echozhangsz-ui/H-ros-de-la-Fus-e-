@@ -336,6 +336,10 @@ const RESOURCE_META = {
   coin: { label: "Coin", color: 0xe4b93d }
 };
 
+const MAP_SIZE = 160;
+const MAP_LIMIT = MAP_SIZE / 2 - 2;
+const CAMERA_DISTANCE = 20;
+
 const state = {
   hp: 12,
   maxHp: 12,
@@ -361,9 +365,9 @@ const state = {
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x95b879);
-scene.fog = new THREE.Fog(0x95b879, 16, 45);
+scene.fog = new THREE.Fog(0x95b879, 45, 145);
 
-const camera = new THREE.PerspectiveCamera(48, 1, .1, 80);
+const camera = new THREE.PerspectiveCamera(48, 1, .1, 220);
 const renderer = new THREE.WebGLRenderer({ antialias: false });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
@@ -375,10 +379,10 @@ const sun = new THREE.DirectionalLight(0xffffff, 2.5);
 sun.position.set(8, 12, 5);
 sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
-sun.shadow.camera.left = -18;
-sun.shadow.camera.right = 18;
-sun.shadow.camera.top = 18;
-sun.shadow.camera.bottom = -18;
+sun.shadow.camera.left = -45;
+sun.shadow.camera.right = 45;
+sun.shadow.camera.top = 45;
+sun.shadow.camera.bottom = -45;
 scene.add(sun);
 
 const clock = new THREE.Clock();
@@ -403,21 +407,23 @@ function block(parent, size, color, position, options = {}) {
 }
 
 function makeGround() {
-  const ground = block(scene, [34, .35, 34], 0x5f8d45, [0, -.18, 0], { roughness: .92 });
+  const ground = block(scene, [MAP_SIZE, .35, MAP_SIZE], 0x5f8d45, [0, -.18, 0], { roughness: .92 });
   ground.castShadow = false;
   state.ground = ground;
 
-  for (let x = -15; x <= 15; x += 2) {
-    for (let z = -15; z <= 15; z += 2) {
-      if ((x + z) % 6 === 0) block(scene, [1.9, .06, 1.9], 0x6e9b4e, [x, .02, z]);
+  for (let x = -MAP_LIMIT; x <= MAP_LIMIT; x += 5) {
+    for (let z = -MAP_LIMIT; z <= MAP_LIMIT; z += 5) {
+      if ((Math.round(x + z)) % 15 === 0) {
+        block(scene, [3.6, .06, 3.6], 0x6e9b4e, [x, .02, z]);
+      }
     }
   }
 
-  for (let i = 0; i < 55; i++) {
-    const x = Math.random() * 32 - 16;
-    const z = Math.random() * 32 - 16;
-    if (Math.hypot(x, z) < 3) continue;
-    block(scene, [.25, .12, .25], 0x3f6f36, [x, .08, z]);
+  for (let i = 0; i < 150; i++) {
+    const x = Math.random() * (MAP_SIZE - 8) - MAP_LIMIT;
+    const z = Math.random() * (MAP_SIZE - 8) - MAP_LIMIT;
+    if (Math.hypot(x, z) < 6) continue;
+    block(scene, [.35, .14, .35], 0x3f6f36, [x, .08, z]);
   }
 }
 
@@ -516,17 +522,25 @@ function makeEnemy(type, x, z) {
 function seedWorld() {
   makeGround();
   [
-    [-7, -6], [-10, -1], [-6, 5], [-1, -8], [5, -7], [9, -2], [7, 6], [-11, 8], [2, 9]
+    [-28, -22], [-35, -12], [-24, 8], [-14, -34], [16, -30], [30, -16], [25, 24], [-42, 32], [8, 38],
+    [-62, -46], [-68, -30], [-54, -12], [-46, 12], [-58, 42], [-36, 56], [-18, 62],
+    [42, -54], [58, -42], [68, -18], [52, 12], [62, 38], [36, 56], [12, 64]
   ].forEach(([x, z]) => state.nodes.push(makeTree(x, z)));
 
-  [[-4, 8], [4, 4], [11, 8], [-12, -7]].forEach(([x, z]) => state.nodes.push(makeRock("stone", x, z)));
-  [[-8, 11], [12, -6], [2, -12]].forEach(([x, z]) => state.nodes.push(makeRock("iron", x, z)));
+  [
+    [-18, 30], [-6, 28], [12, 24], [32, 34], [48, 22], [-46, -40], [-58, -18], [54, -58], [66, -36]
+  ].forEach(([x, z]) => state.nodes.push(makeRock("stone", x, z)));
+  [
+    [-54, 56], [-34, 66], [34, -66], [58, -52], [62, 58], [18, 70]
+  ].forEach(([x, z]) => state.nodes.push(makeRock("iron", x, z)));
 
   [
-    ["zombie", -9, 3], ["zombie", -11, 4],
-    ["davide", 7, 1], ["davide", 9, 2],
-    ["olivier", 0, 10], ["olivier", 2, 11],
-    ["zombie", 11, -10], ["davide", 13, -9]
+    ["zombie", -22, 14], ["zombie", -26, 18], ["zombie", -30, 10],
+    ["davide", 24, 4], ["davide", 30, 8],
+    ["olivier", -4, 42], ["olivier", 6, 46],
+    ["zombie", 48, -46], ["zombie", 54, -42], ["davide", 60, -38],
+    ["zombie", -58, -34], ["olivier", -64, -28], ["davide", -50, -20],
+    ["davide", 46, 50], ["olivier", 56, 58]
   ].forEach(args => state.enemies.push(makeEnemy(...args)));
 }
 
@@ -674,10 +688,13 @@ function killEnemy(enemy) {
 
 function updatePlayer(dt, elapsed) {
   const dir = new THREE.Vector3();
-  if (state.keys.has("KeyW") || state.keys.has("ArrowUp")) dir.z -= 1;
-  if (state.keys.has("KeyS") || state.keys.has("ArrowDown")) dir.z += 1;
-  if (state.keys.has("KeyA") || state.keys.has("ArrowLeft")) dir.x -= 1;
-  if (state.keys.has("KeyD") || state.keys.has("ArrowRight")) dir.x += 1;
+  const forward = new THREE.Vector3(-Math.sin(state.cameraYaw), 0, -Math.cos(state.cameraYaw));
+  const right = new THREE.Vector3(Math.cos(state.cameraYaw), 0, -Math.sin(state.cameraYaw));
+  if (state.keys.has("KeyW") || state.keys.has("ArrowUp")) dir.add(forward);
+  if (state.keys.has("KeyS") || state.keys.has("ArrowDown")) dir.sub(forward);
+  if (state.keys.has("KeyA") || state.keys.has("ArrowLeft")) dir.sub(right);
+  if (state.keys.has("KeyD") || state.keys.has("ArrowRight")) dir.add(right);
+  if (dir.lengthSq() > 0) state.moveTarget = null;
   if (state.moveTarget) {
     const toTarget = state.moveTarget.clone().sub(player.root.position);
     toTarget.y = 0;
@@ -690,8 +707,8 @@ function updatePlayer(dt, elapsed) {
   if (dir.lengthSq() > 0) {
     dir.normalize();
     player.root.position.addScaledVector(dir, dt * 4.2);
-    player.root.position.x = THREE.MathUtils.clamp(player.root.position.x, -15.5, 15.5);
-    player.root.position.z = THREE.MathUtils.clamp(player.root.position.z, -15.5, 15.5);
+    player.root.position.x = THREE.MathUtils.clamp(player.root.position.x, -MAP_LIMIT, MAP_LIMIT);
+    player.root.position.z = THREE.MathUtils.clamp(player.root.position.z, -MAP_LIMIT, MAP_LIMIT);
     player.root.rotation.y = Math.atan2(dir.x, dir.z);
   }
   const walk = Math.sin(elapsed * 8) * (dir.lengthSq() > 0 ? 1 : .2);
@@ -740,7 +757,7 @@ function updateEnemies(dt, elapsed) {
 
     const distanceFromSpawn = enemy.group.position.distanceTo(enemy.spawn);
     const distanceToPlayer = enemy.group.position.distanceTo(player.root.position);
-    enemy.active = distanceToPlayer < 5.5 || (enemy.active && distanceFromSpawn < 8);
+    enemy.active = distanceToPlayer < 8.5 || (enemy.active && distanceFromSpawn < 14);
 
     if (enemy.active) {
       const dir = player.root.position.clone().sub(enemy.group.position);
@@ -804,7 +821,7 @@ function updateFragments(dt) {
 
 function updateCamera() {
   const target = player.root.position.clone();
-  const distance = 12;
+  const distance = CAMERA_DISTANCE;
   const horizontal = Math.cos(state.cameraPitch) * distance;
   const desired = target.clone().add(new THREE.Vector3(
     Math.sin(state.cameraYaw) * horizontal,
@@ -831,8 +848,8 @@ function handlePointerClick(event) {
   attack(false);
   const point = screenToGround(event.clientX, event.clientY);
   if (point) {
-    point.x = THREE.MathUtils.clamp(point.x, -15.5, 15.5);
-    point.z = THREE.MathUtils.clamp(point.z, -15.5, 15.5);
+    point.x = THREE.MathUtils.clamp(point.x, -MAP_LIMIT, MAP_LIMIT);
+    point.z = THREE.MathUtils.clamp(point.z, -MAP_LIMIT, MAP_LIMIT);
     point.y = 0;
     state.moveTarget = point;
   }
