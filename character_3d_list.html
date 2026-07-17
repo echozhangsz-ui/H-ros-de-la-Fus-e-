@@ -1482,16 +1482,16 @@ function buildBlockCharacter(config) {
   if (config.zombie) {
     leftArm.rotation.x = -.75;
     rightArm.rotation.x = -.75;
-    const armFrontZ = armThickness / 2 + .018;
-    const armSideX = armThickness / 2 + .018;
-    zombiePatch(leftArm, [.16, .24, .04], 0x3f6b35, [0, -.24, armFrontZ]);
-    zombiePatch(leftArm, [.2, .18, .04], 0x83a85e, [0, -.62, armFrontZ + .004]);
-    zombiePatch(leftArm, [.04, .22, .16], 0x507c40, [-armSideX, -.42, -.04]);
-    zombiePatch(leftArm, [.04, .18, .2], 0x385f31, [armSideX, -.86, .02]);
-    zombiePatch(rightArm, [.18, .2, .04], 0x3b6632, [0, -.3, armFrontZ]);
-    zombiePatch(rightArm, [.14, .26, .04], 0x86aa61, [0, -.74, armFrontZ + .004]);
-    zombiePatch(rightArm, [.04, .2, .18], 0x527f40, [armSideX, -.5, -.05]);
-    zombiePatch(rightArm, [.04, .16, .22], 0x34592e, [-armSideX, -.95, .03]);
+    const armFrontZ = armThickness / 2 + .012;
+    const armSideX = armThickness / 2 + .012;
+    zombiePatch(leftArm, [.16, .24, .035], 0x3f6b35, [0, -.24, armFrontZ]);
+    zombiePatch(leftArm, [.2, .18, .035], 0x83a85e, [0, -.62, armFrontZ + .002]);
+    zombiePatch(leftArm, [.035, .22, .16], 0x507c40, [-armSideX, -.42, -.04]);
+    zombiePatch(leftArm, [.035, .18, .2], 0x385f31, [armSideX, -.86, .02]);
+    zombiePatch(rightArm, [.18, .2, .035], 0x3b6632, [0, -.3, armFrontZ]);
+    zombiePatch(rightArm, [.14, .26, .035], 0x86aa61, [0, -.74, armFrontZ + .002]);
+    zombiePatch(rightArm, [.035, .2, .18], 0x527f40, [armSideX, -.5, -.05]);
+    zombiePatch(rightArm, [.035, .16, .22], 0x34592e, [-armSideX, -.95, .03]);
     const legFrontZ = legThickness / 2 + .018;
     const legSideX = legThickness / 2 + .018;
     zombiePatch(leftLeg, [.16, .18, .04], 0x3f6b35, [0, -.28, legFrontZ]);
