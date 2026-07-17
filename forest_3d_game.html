@@ -118,6 +118,42 @@ canvas {
   line-height: 1;
 }
 
+.toolbelt {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.tool-button {
+  width: 82px;
+  height: 58px;
+  border: 3px solid var(--line);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  box-shadow: 0 8px 18px rgba(0,0,0,.18);
+}
+
+.tool-button.active {
+  background: #f1c85f;
+  box-shadow: inset 0 0 0 3px #fff2bc, 0 8px 18px rgba(0,0,0,.18);
+}
+
+.tool-icon {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
 .modal button,
 .game-over button {
   border: 3px solid var(--line);
@@ -274,6 +310,17 @@ canvas {
     width: 74px;
     height: 58px;
   }
+
+  .toolbelt {
+    gap: 5px;
+    bottom: 10px;
+  }
+
+  .tool-button {
+    width: 64px;
+    height: 54px;
+    font-size: 10px;
+  }
 }
 </style>
 </head>
@@ -288,6 +335,12 @@ canvas {
   </div>
   <div class="panel toast" id="toast">Need to get closer</div>
   <button class="bag-button" id="bagButton" type="button"><strong>Bag</strong>Items</button>
+  <div class="toolbelt" id="toolbelt">
+    <button class="tool-button active" type="button" data-tool="sword"><span class="tool-icon">I</span>Sword</button>
+    <button class="tool-button" type="button" data-tool="axe"><span class="tool-icon">Y</span>Axe</button>
+    <button class="tool-button" type="button" data-tool="hammer"><span class="tool-icon">T</span>Hammer</button>
+    <button class="tool-button" type="button" data-tool="pickaxe"><span class="tool-icon">P</span>Pickaxe</button>
+  </div>
 </div>
 
 <div class="modal-backdrop" id="inventoryModal">
@@ -328,6 +381,7 @@ const closeInventory = document.getElementById("closeInventory");
 const gameOverEl = document.getElementById("gameOver");
 const playAgain = document.getElementById("playAgain");
 const toast = document.getElementById("toast");
+const toolButtons = [...document.querySelectorAll(".tool-button")];
 
 const RESOURCE_META = {
   wood: { label: "Wood", color: 0x7a4f2e },
@@ -339,6 +393,9 @@ const RESOURCE_META = {
 const MAP_SIZE = 160;
 const MAP_LIMIT = MAP_SIZE / 2 - 2;
 const CAMERA_DISTANCE = 20;
+const TOOL_FOR_NODE = { wood: "axe", stone: "hammer", iron: "pickaxe" };
+const TOOL_LABELS = { sword: "Sword", axe: "Axe", hammer: "Hammer", pickaxe: "Pickaxe" };
+const NODE_TOOL_NAMES = { wood: "Axe", stone: "Hammer", iron: "Pickaxe" };
 
 const state = {
   hp: 12,
@@ -353,13 +410,16 @@ const state = {
   moveTarget: null,
   cameraYaw: Math.PI / 4,
   cameraPitch: .82,
+  cameraDistance: CAMERA_DISTANCE,
   pointerDown: false,
   pointerMoved: false,
   pointerStart: { x: 0, y: 0 },
   pointerLast: { x: 0, y: 0 },
   gameOver: false,
+  activeTool: "sword",
   attackCooldown: 0,
   gatherCooldown: 0,
+  toolHintCooldown: 0,
   playerHitCooldown: 0
 };
 
@@ -410,6 +470,13 @@ function makeGround() {
   const ground = block(scene, [MAP_SIZE, .35, MAP_SIZE], 0x5f8d45, [0, -.18, 0], { roughness: .92 });
   ground.castShadow = false;
   state.ground = ground;
+
+  block(scene, [58, .08, 56], 0x416f35, [-48, .02, -22], { roughness: .95 });
+  block(scene, [46, .08, 44], 0x6f7b77, [48, .025, 24], { roughness: .95 });
+  block(scene, [44, .08, 38], 0x596567, [42, .03, -52], { roughness: .95 });
+  block(scene, [16, .09, 92], 0x8b6f46, [0, .04, 0], { roughness: .9 });
+  block(scene, [92, .09, 14], 0x8b6f46, [2, .045, 22], { roughness: .9 });
+  block(scene, [66, .09, 12], 0x8b6f46, [14, .05, -42], { rotation: [0, -.35, 0], roughness: .9 });
 
   for (let x = -MAP_LIMIT; x <= MAP_LIMIT; x += 5) {
     for (let z = -MAP_LIMIT; z <= MAP_LIMIT; z += 5) {
@@ -522,25 +589,24 @@ function makeEnemy(type, x, z) {
 function seedWorld() {
   makeGround();
   [
-    [-28, -22], [-35, -12], [-24, 8], [-14, -34], [16, -30], [30, -16], [25, 24], [-42, 32], [8, 38],
-    [-62, -46], [-68, -30], [-54, -12], [-46, 12], [-58, 42], [-36, 56], [-18, 62],
-    [42, -54], [58, -42], [68, -18], [52, 12], [62, 38], [36, 56], [12, 64]
+    [-68, -48], [-60, -38], [-50, -50], [-42, -36], [-70, -22], [-56, -18], [-42, -12], [-30, -24],
+    [-64, 2], [-52, 8], [-38, 4], [-28, 14], [-70, 24], [-54, 32], [-38, 28], [-22, 36],
+    [-46, -62], [-28, -54], [-14, -40], [-18, 52], [-6, 42]
   ].forEach(([x, z]) => state.nodes.push(makeTree(x, z)));
 
   [
-    [-18, 30], [-6, 28], [12, 24], [32, 34], [48, 22], [-46, -40], [-58, -18], [54, -58], [66, -36]
+    [28, 10], [42, 12], [56, 14], [34, 26], [48, 28], [62, 30], [30, 42], [46, 48], [60, 44], [70, 22]
   ].forEach(([x, z]) => state.nodes.push(makeRock("stone", x, z)));
   [
-    [-54, 56], [-34, 66], [34, -66], [58, -52], [62, 58], [18, 70]
+    [22, -64], [34, -58], [48, -66], [58, -54], [66, -42], [42, -38], [28, -44], [70, -62]
   ].forEach(([x, z]) => state.nodes.push(makeRock("iron", x, z)));
 
   [
-    ["zombie", -22, 14], ["zombie", -26, 18], ["zombie", -30, 10],
-    ["davide", 24, 4], ["davide", 30, 8],
-    ["olivier", -4, 42], ["olivier", 6, 46],
-    ["zombie", 48, -46], ["zombie", 54, -42], ["davide", 60, -38],
-    ["zombie", -58, -34], ["olivier", -64, -28], ["davide", -50, -20],
-    ["davide", 46, 50], ["olivier", 56, 58]
+    ["zombie", -36, -8], ["zombie", -42, 2], ["olivier", -24, 24],
+    ["davide", 18, 18], ["davide", 22, 32], ["olivier", 66, 36],
+    ["zombie", 28, -48], ["zombie", 44, -44], ["davide", 58, -50],
+    ["zombie", -8, -30], ["olivier", 2, 28], ["davide", 8, -44],
+    ["davide", 60, 2], ["olivier", -58, 18]
   ].forEach(args => state.enemies.push(makeEnemy(...args)));
 }
 
@@ -598,6 +664,18 @@ function showToast(text) {
   showToast.timer = setTimeout(() => toast.classList.remove("show"), 900);
 }
 
+function updateToolUi() {
+  for (const button of toolButtons) {
+    button.classList.toggle("active", button.dataset.tool === state.activeTool);
+  }
+}
+
+function selectTool(tool) {
+  state.activeTool = tool;
+  updateToolUi();
+  showToast(TOOL_LABELS[tool] + " equipped");
+}
+
 function worldToScreen(position) {
   tempVector.copy(position).project(camera);
   return {
@@ -639,6 +717,11 @@ function gather(showMessage = true) {
     if (showMessage) showToast("Get closer to a resource");
     return;
   }
+  const neededTool = TOOL_FOR_NODE[target.type];
+  if (state.activeTool !== neededTool) {
+    if (showMessage) showToast("Use " + NODE_TOOL_NAMES[target.type] + " for " + RESOURCE_META[target.type].label);
+    return;
+  }
   target.hp -= 1;
   target.group.rotation.z = (Math.random() - .5) * .15;
   setTimeout(() => { target.group.rotation.z = 0; }, 130);
@@ -656,7 +739,12 @@ function updateAutoGather() {
   for (const node of state.nodes) {
     if (node.dead) continue;
     if (node.group.position.distanceTo(player.root.position) < node.radius + 1.05) {
-      gather(false);
+      if (state.activeTool === TOOL_FOR_NODE[node.type]) {
+        gather(false);
+      } else if (state.toolHintCooldown <= 0) {
+        showToast("Equip " + NODE_TOOL_NAMES[node.type]);
+        state.toolHintCooldown = 1.4;
+      }
       return;
     }
   }
@@ -664,6 +752,10 @@ function updateAutoGather() {
 
 function attack(showMessage = true) {
   if (state.gameOver || state.attackCooldown > 0) return;
+  if (state.activeTool !== "sword") {
+    if (showMessage) showToast("Equip Sword to attack");
+    return;
+  }
   state.attackCooldown = .42;
   let hit = false;
   for (const enemy of state.enemies) {
@@ -821,7 +913,7 @@ function updateFragments(dt) {
 
 function updateCamera() {
   const target = player.root.position.clone();
-  const distance = CAMERA_DISTANCE;
+  const distance = state.cameraDistance;
   const horizontal = Math.cos(state.cameraPitch) * distance;
   const desired = target.clone().add(new THREE.Vector3(
     Math.sin(state.cameraYaw) * horizontal,
@@ -914,6 +1006,15 @@ renderer.domElement.addEventListener("pointercancel", () => {
   state.pointerMoved = false;
 });
 
+renderer.domElement.addEventListener("wheel", event => {
+  event.preventDefault();
+  state.cameraDistance = THREE.MathUtils.clamp(state.cameraDistance + event.deltaY * .018, 9, 34);
+}, { passive: false });
+
+for (const button of toolButtons) {
+  button.addEventListener("click", () => selectTool(button.dataset.tool));
+}
+
 bagButton.addEventListener("click", () => {
   updateInventoryUi();
   inventoryModal.classList.add("open");
@@ -930,6 +1031,7 @@ function tick() {
   if (!state.gameOver) {
     state.attackCooldown = Math.max(0, state.attackCooldown - dt);
     state.gatherCooldown = Math.max(0, state.gatherCooldown - dt);
+    state.toolHintCooldown = Math.max(0, state.toolHintCooldown - dt);
     state.playerHitCooldown = Math.max(0, state.playerHitCooldown - dt);
     updatePlayer(dt, elapsed);
     updateAutoGather();
@@ -946,6 +1048,7 @@ function tick() {
 resize();
 updateHud();
 updateInventoryUi();
+updateToolUi();
 tick();
 </script>
 
