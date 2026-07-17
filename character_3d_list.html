@@ -643,23 +643,29 @@ h1 {
 }
 
 .braid {
-  top: 48px;
-  width: 9px;
-  height: 58px;
+  top: 20px;
+  width: 12px;
+  height: 82px;
   border-radius: 999px;
   background: var(--hair);
 }
 
 .braid.left {
-  margin-left: -62px;
-  transform: rotate(18deg);
-  box-shadow: -8px 20px 0 var(--hair), -13px 40px 0 var(--hair);
+  margin-left: -74px;
+  transform: rotate(8deg);
+  box-shadow:
+    12px -10px 0 -2px var(--hair),
+    -6px 24px 0 2px var(--hair),
+    -10px 50px 0 4px var(--hair);
 }
 
 .braid.right {
-  margin-left: 53px;
-  transform: rotate(-18deg);
-  box-shadow: 8px 20px 0 var(--hair), 13px 40px 0 var(--hair);
+  margin-left: 62px;
+  transform: rotate(-8deg);
+  box-shadow:
+    -12px -10px 0 -2px var(--hair),
+    6px 24px 0 2px var(--hair),
+    10px 50px 0 4px var(--hair);
 }
 
 .boss-css .body {
@@ -1176,17 +1182,20 @@ function addHair(root, config, headY, headSize) {
     receiver.position.set(0, topY + .42, 0);
     receiver.castShadow = true;
     root.add(receiver);
+    block(root, [.2, .14, .18], config.hair, [-.48, topY - .06, .1], { rotation: [0, 0, -.18] });
+    block(root, [.2, .14, .18], config.hair, [.48, topY - .06, .1], { rotation: [0, 0, .18] });
     const leftBraid = new THREE.Group();
-    leftBraid.position.set(-.55, headY - .02, .02);
-    leftBraid.rotation.z = .32;
+    leftBraid.position.set(-.72, topY - .04, .06);
+    leftBraid.rotation.z = .12;
     root.add(leftBraid);
     const rightBraid = new THREE.Group();
-    rightBraid.position.set(.55, headY - .02, .02);
-    rightBraid.rotation.z = -.32;
+    rightBraid.position.set(.72, topY - .04, .06);
+    rightBraid.rotation.z = -.12;
     root.add(rightBraid);
-    for (let i = 0; i < 4; i++) {
-      block(leftBraid, [.16, .18, .14], config.hair, [0, -.16 - i * .16, .02]);
-      block(rightBraid, [.16, .18, .14], config.hair, [0, -.16 - i * .16, .02]);
+    for (let i = 0; i < 5; i++) {
+      const size = .18 + i * .015;
+      block(leftBraid, [size, .18, .16], config.hair, [-.03 - i * .015, -.16 - i * .17, .02]);
+      block(rightBraid, [size, .18, .16], config.hair, [.03 + i * .015, -.16 - i * .17, .02]);
     }
   }
   if (config.id === "olivier" || config.boss) {
