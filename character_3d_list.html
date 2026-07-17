@@ -1547,29 +1547,32 @@ function resizeRenderer(entry, viewer) {
 function animateModel(model, elapsed) {
   const { config, parts, root } = model;
   if (config.spiderBoss) {
-    const crawl = Math.sin(elapsed * 3.2);
+    const crawl = Math.sin(elapsed * 4.1);
     const shootWave = Math.sin(elapsed * 1.55);
     const shootRaise = Math.max(0, shootWave);
     const shootEase = shootRaise * shootRaise * (3 - 2 * shootRaise);
-    root.position.y = .02 + Math.abs(crawl) * .035;
-    parts.body.rotation.z = crawl * .018;
-    parts.head.rotation.z = -crawl * .024;
+    root.position.y = .02 + Math.abs(crawl) * .055;
+    parts.body.rotation.z = crawl * .032;
+    parts.head.rotation.z = -crawl * .04;
     parts.spiderLegs.forEach((leg, i) => {
       const sideOffset = leg.side === "left" ? 0 : Math.PI;
-      const rowOffset = leg.index * 1.05;
-      const phase = Math.sin(elapsed * 3.6 + rowOffset + sideOffset);
-      const rearDamping = leg.index === 2 ? .62 : 1;
-      const lift = leg.index === 0 ? .34 : leg.index === 1 ? .25 : .18;
-      leg.pivot.rotation.z = leg.basePivotZ + phase * .1 * rearDamping;
-      leg.pivot.rotation.x = leg.basePivotX + phase * .045 * rearDamping;
-      leg.upper.rotation.z = leg.baseUpperZ + phase * .055 * rearDamping * (leg.side === "left" ? 1 : -1);
-      leg.lower.rotation.z = leg.baseLowerZ + phase * lift * rearDamping * (leg.side === "left" ? -1 : 1);
-      leg.foot.rotation.z = leg.baseFootZ + phase * .08 * rearDamping;
+      const rowOffset = leg.index * 1.35;
+      const phase = elapsed * 4.6 + rowOffset + sideOffset;
+      const stride = Math.sin(phase);
+      const stepLift = Math.max(0, Math.sin(phase + Math.PI / 2));
+      const stepEase = stepLift * stepLift * (3 - 2 * stepLift);
+      const sideDirection = leg.side === "left" ? 1 : -1;
+      const rowPower = leg.index === 0 ? 1.18 : leg.index === 1 ? 1.05 : .96;
+      leg.pivot.rotation.z = leg.basePivotZ + stride * .16 * rowPower + stepEase * .22 * sideDirection;
+      leg.pivot.rotation.x = leg.basePivotX + stride * .1 * rowPower - stepEase * .18;
+      leg.upper.rotation.z = leg.baseUpperZ + stride * .11 * rowPower * sideDirection;
+      leg.lower.rotation.z = leg.baseLowerZ + (stride * .36 + stepEase * .42) * rowPower * -sideDirection;
+      leg.foot.rotation.z = leg.baseFootZ + stride * .16 * rowPower + stepEase * .2 * sideDirection;
     });
-    parts.spiderLegs[0].pivot.rotation.z -= shootEase * .28;
-    parts.spiderLegs[1].pivot.rotation.z += shootEase * .28;
-    parts.spiderLegs[0].lower.rotation.z += shootEase * .12;
-    parts.spiderLegs[1].lower.rotation.z -= shootEase * .12;
+    parts.spiderLegs[0].pivot.rotation.z -= shootEase * .34;
+    parts.spiderLegs[1].pivot.rotation.z += shootEase * .34;
+    parts.spiderLegs[0].lower.rotation.z += shootEase * .18;
+    parts.spiderLegs[1].lower.rotation.z -= shootEase * .18;
     return;
   }
   const speed = config.boss ? 2.6 : config.zombie ? 3.1 : config.id === "davide" ? 4.8 : 4.1;
