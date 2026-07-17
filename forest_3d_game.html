@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forest Resource Map | Rocket Boss Game</title>
+<style>
+:root {
+  --ink: #171511;
+  --line: #211f18;
+  --panel: #fff8e9;
+  --wood: #7a4f2e;
+  --stone: #a9adb0;
+  --iron: #d2d0c6;
+  --coin: #e4b93d;
+  --hp: #d7372f;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  background: #151d14;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.top-left {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  display: grid;
+  gap: 8px;
+  min-width: 230px;
+}
+
+.panel {
+  border: 3px solid var(--line);
+  background: rgba(255, 248, 233, .94);
+  box-shadow: 0 10px 26px rgba(0,0,0,.22);
+}
+
+.health-panel {
+  padding: 10px;
+}
+
+.hearts {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 7px;
+}
+
+.heart {
+  width: 20px;
+  height: 18px;
+  background: var(--hp);
+  clip-path: polygon(50% 91%, 8% 48%, 4% 22%, 18% 4%, 38% 8%, 50% 20%, 62% 8%, 82% 4%, 96% 22%, 92% 48%);
+}
+
+.heart.empty {
+  background: #7f7567;
+}
+
+.bar {
+  height: 14px;
+  border: 2px solid var(--line);
+  background: #6d5c43;
+}
+
+.bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #e23b32, #ff7d42);
+}
+
+.hint {
+  padding: 9px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.bag-button {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  width: 82px;
+  height: 62px;
+  pointer-events: auto;
+  border: 3px solid var(--line);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bag-button strong {
+  display: block;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.action-pad {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.action-pad button,
+.modal button,
+.game-over button {
+  border: 3px solid var(--line);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--ink);
+  padding: 11px 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  min-width: 220px;
+  padding: 9px 14px;
+  text-align: center;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+.toast.show { opacity: 1; }
+
+.modal-backdrop,
+.game-over {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background: rgba(0,0,0,.36);
+  pointer-events: auto;
+}
+
+.modal-backdrop.open,
+.game-over.open {
+  display: grid;
+}
+
+.modal {
+  width: min(520px, calc(100vw - 28px));
+  padding: 18px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.modal h2,
+.game-over h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.slot {
+  position: relative;
+  aspect-ratio: 1;
+  border: 3px solid var(--line);
+  background: #f4ead7;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+
+.slot-icon {
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--line);
+  box-shadow: inset -6px -6px 0 rgba(0,0,0,.18);
+}
+
+.slot-count {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.enemy-label {
+  position: absolute;
+  min-width: 76px;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+
+.enemy-name {
+  margin-bottom: 2px;
+  padding: 2px 4px;
+  border: 2px solid var(--line);
+  background: rgba(255,248,233,.9);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.enemy-bar {
+  height: 8px;
+  border: 2px solid var(--line);
+  background: #4d362c;
+}
+
+.enemy-fill {
+  height: 100%;
+  width: 100%;
+  background: #df3b32;
+}
+
+.fly-item {
+  position: fixed;
+  z-index: 20;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--line);
+  pointer-events: none;
+  transition: transform .55s cubic-bezier(.25,.85,.25,1), opacity .55s ease;
+}
+
+.game-over-card {
+  width: min(420px, calc(100vw - 28px));
+  padding: 22px;
+  text-align: center;
+}
+
+.game-over p {
+  margin: 10px 0 18px;
+}
+
+.no-webgl {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background: #efe3c8;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .top-left {
+    min-width: 190px;
+    right: 14px;
+  }
+
+  .hint {
+    display: none;
+  }
+
+  .bag-button {
+    width: 74px;
+    height: 58px;
+  }
+}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div class="hud">
+  <div class="top-left">
+    <div class="panel health-panel">
+      <div class="hearts" id="hearts"></div>
+      <div class="bar"><div class="bar-fill" id="playerHpBar"></div></div>
+    </div>
+    <div class="panel hint">WASD / Arrows move · E collect · Space attack<br>Collect drops by walking over them.</div>
+  </div>
+  <div class="panel toast" id="toast">Need to get closer</div>
+  <button class="bag-button" id="bagButton" type="button"><strong>Bag</strong>Items</button>
+  <div class="action-pad">
+    <button id="gatherButton" type="button">Gather</button>
+    <button id="attackButton" type="button">Attack</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="inventoryModal">
+  <div class="modal panel">
+    <div class="modal-header">
+      <h2>Backpack</h2>
+      <button id="closeInventory" type="button">Close</button>
+    </div>
+    <div class="inventory-grid" id="inventoryGrid"></div>
+  </div>
+</div>
+
+<div class="game-over" id="gameOver">
+  <div class="game-over-card panel">
+    <h2>Game Over</h2>
+    <p>Marc was defeated in the forest.</p>
+    <button id="playAgain" type="button">Play Again</button>
+  </div>
+</div>
+
+<div class="no-webgl" id="noWebgl">
+  <div class="panel modal">
+    <h2>Forest Map</h2>
+    <p>Three.js did not load, so the 3D forest cannot start. Check that <code>three.module.js</code> is beside this file.</p>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from "./three.module.js";
+
+const gameEl = document.getElementById("game");
+const heartsEl = document.getElementById("hearts");
+const playerHpBar = document.getElementById("playerHpBar");
+const bagButton = document.getElementById("bagButton");
+const inventoryModal = document.getElementById("inventoryModal");
+const inventoryGrid = document.getElementById("inventoryGrid");
+const closeInventory = document.getElementById("closeInventory");
+const gameOverEl = document.getElementById("gameOver");
+const playAgain = document.getElementById("playAgain");
+const toast = document.getElementById("toast");
+const gatherButton = document.getElementById("gatherButton");
+const attackButton = document.getElementById("attackButton");
+
+const RESOURCE_META = {
+  wood: { label: "Wood", color: 0x7a4f2e },
+  stone: { label: "Stone", color: 0xa9adb0 },
+  iron: { label: "Iron", color: 0xd2d0c6 },
+  coin: { label: "Coin", color: 0xe4b93d }
+};
+
+const state = {
+  hp: 12,
+  maxHp: 12,
+  inventory: { wood: 0, stone: 0, iron: 0, coin: 0 },
+  drops: [],
+  nodes: [],
+  enemies: [],
+  fragments: [],
+  enemyLabels: [],
+  keys: new Set(),
+  gameOver: false,
+  attackCooldown: 0,
+  gatherCooldown: 0,
+  playerHitCooldown: 0
+};
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x95b879);
+scene.fog = new THREE.Fog(0x95b879, 16, 45);
+
+const camera = new THREE.PerspectiveCamera(48, 1, .1, 80);
+const renderer = new THREE.WebGLRenderer({ antialias: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+gameEl.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xf8ffe6, 0x536832, 1.9));
+const sun = new THREE.DirectionalLight(0xffffff, 2.5);
+sun.position.set(8, 12, 5);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.left = -18;
+sun.shadow.camera.right = 18;
+sun.shadow.camera.top = 18;
+sun.shadow.camera.bottom = -18;
+scene.add(sun);
+
+const clock = new THREE.Clock();
+const raycaster = new THREE.Raycaster();
+const tempVector = new THREE.Vector3();
+
+function material(color, roughness = .78) {
+  return new THREE.MeshStandardMaterial({ color, roughness });
+}
+
+function block(parent, size, color, position, options = {}) {
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(size[0], size[1], size[2]),
+    material(color, options.roughness)
+  );
+  mesh.position.set(position[0], position[1], position[2]);
+  if (options.rotation) mesh.rotation.set(options.rotation[0], options.rotation[1], options.rotation[2]);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
+function makeGround() {
+  const ground = block(scene, [34, .35, 34], 0x5f8d45, [0, -.18, 0], { roughness: .92 });
+  ground.castShadow = false;
+
+  for (let x = -15; x <= 15; x += 2) {
+    for (let z = -15; z <= 15; z += 2) {
+      if ((x + z) % 6 === 0) block(scene, [1.9, .06, 1.9], 0x6e9b4e, [x, .02, z]);
+    }
+  }
+
+  for (let i = 0; i < 55; i++) {
+    const x = Math.random() * 32 - 16;
+    const z = Math.random() * 32 - 16;
+    if (Math.hypot(x, z) < 3) continue;
+    block(scene, [.25, .12, .25], 0x3f6f36, [x, .08, z]);
+  }
+}
+
+function makePlayer() {
+  const root = new THREE.Group();
+  root.position.set(0, 0, 0);
+  root.userData.velocity = new THREE.Vector3();
+  scene.add(root);
+
+  const legs = new THREE.Group();
+  root.add(legs);
+  const leftLeg = block(legs, [.34, .72, .34], 0xcfd5de, [-.2, .36, 0]);
+  const rightLeg = block(legs, [.34, .72, .34], 0xe5e8ee, [.2, .36, 0]);
+  const body = block(root, [.9, .95, .48], 0xf4f0e5, [0, 1.16, 0]);
+  const head = block(root, [.72, .72, .48], 0x69a78b, [0, 1.98, 0]);
+  block(root, [.8, .11, .56], 0x1b1b1b, [0, 2.39, 0]);
+  const leftArm = block(root, [.34, .86, .34], 0x4a8b70, [-.67, 1.22, 0]);
+  const rightArm = block(root, [.34, .86, .34], 0x4a8b70, [.67, 1.22, 0]);
+  block(root, [.11, .11, .03], 0x111111, [-.16, 2.04, .255]);
+  block(root, [.11, .11, .03], 0x111111, [.16, 2.04, .255]);
+  block(root, [.3, .05, .03], 0x111111, [0, 1.82, .255]);
+
+  return { root, leftLeg, rightLeg, body, head, leftArm, rightArm };
+}
+
+function makeTree(x, z) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  scene.add(group);
+  block(group, [.55, 1.55, .55], 0x7a4f2e, [0, .75, 0]);
+  block(group, [1.55, 1.1, 1.55], 0x2f7b36, [0, 1.85, 0]);
+  block(group, [1.05, .75, 1.05], 0x3f963d, [.18, 2.38, -.14]);
+  return { type: "wood", hp: 3, maxHp: 3, group, radius: 1.15, dead: false };
+}
+
+function makeRock(type, x, z) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  scene.add(group);
+  const base = type === "iron" ? 0x8d8f8f : 0x8b8f93;
+  block(group, [1.25, .75, 1.1], base, [0, .38, 0], { rotation: [0, .2, 0] });
+  block(group, [.65, .42, .52], type === "iron" ? 0xd2d0c6 : 0xb8bbbd, [.28, .78, .18]);
+  if (type === "iron") {
+    block(group, [.25, .2, .06], 0xe8e0c8, [-.3, .62, .57]);
+    block(group, [.22, .18, .06], 0xd7caa6, [.26, .35, .57]);
+  }
+  return { type, hp: type === "iron" ? 5 : 4, maxHp: type === "iron" ? 5 : 4, group, radius: 1.05, dead: false };
+}
+
+function makeEnemy(type, x, z) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  scene.add(group);
+
+  const config = {
+    zombie: { name: "Zombie", hp: 7, atk: 1, speed: 1.1, skin: 0x6f9b58, shirt: 0x7a4f2e, pants: 0x638b4f },
+    davide: { name: "Davide", hp: 8, atk: 2, speed: 1.55, skin: 0x78a889, shirt: 0x1f78d1, pants: 0x171717 },
+    olivier: { name: "Olivier", hp: 7, atk: 2, speed: 1.35, skin: 0x82b48b, shirt: 0xf1eee5, pants: 0xe3ddd3 }
+  }[type];
+
+  const leftLeg = block(group, [.28, .7, .28], config.pants, [-.18, .35, 0]);
+  const rightLeg = block(group, [.28, .7, .28], config.pants, [.18, .35, 0]);
+  const body = block(group, [.78, .82, .42], config.shirt, [0, 1.08, 0]);
+  const head = block(group, [.62, .62, .48], config.skin, [0, 1.82, 0]);
+  const leftArm = block(group, [.26, .78, .26], config.skin, [-.56, 1.08, 0]);
+  const rightArm = block(group, [.26, .78, .26], config.skin, [.56, 1.08, 0]);
+  block(group, [.12, .09, .03], 0x111111, [-.14, 1.88, .255]);
+  block(group, [.12, .09, .03], 0x111111, [.14, 1.88, .255]);
+  block(group, [.32, .06, .03], 0x111111, [0, 1.68, .255]);
+
+  const label = document.createElement("div");
+  label.className = "enemy-label";
+  label.innerHTML = '<div class="enemy-name">' + config.name + '</div><div class="enemy-bar"><div class="enemy-fill"></div></div>';
+  document.body.appendChild(label);
+
+  const enemy = {
+    type,
+    name: config.name,
+    hp: config.hp,
+    maxHp: config.hp,
+    atk: config.atk,
+    speed: config.speed,
+    group,
+    parts: { leftLeg, rightLeg, leftArm, rightArm, body, head },
+    spawn: new THREE.Vector3(x, 0, z),
+    active: false,
+    attackCooldown: 0,
+    dead: false,
+    deathTimer: 0,
+    label
+  };
+  state.enemyLabels.push(label);
+  return enemy;
+}
+
+function seedWorld() {
+  makeGround();
+  [
+    [-7, -6], [-10, -1], [-6, 5], [-1, -8], [5, -7], [9, -2], [7, 6], [-11, 8], [2, 9]
+  ].forEach(([x, z]) => state.nodes.push(makeTree(x, z)));
+
+  [[-4, 8], [4, 4], [11, 8], [-12, -7]].forEach(([x, z]) => state.nodes.push(makeRock("stone", x, z)));
+  [[-8, 11], [12, -6], [2, -12]].forEach(([x, z]) => state.nodes.push(makeRock("iron", x, z)));
+
+  [
+    ["zombie", -9, 3], ["zombie", -11, 4],
+    ["davide", 7, 1], ["davide", 9, 2],
+    ["olivier", 0, 10], ["olivier", 2, 11],
+    ["zombie", 11, -10], ["davide", 13, -9]
+  ].forEach(args => state.enemies.push(makeEnemy(...args)));
+}
+
+function spawnDrop(type, origin, count = 1) {
+  for (let i = 0; i < count; i++) {
+    const mesh = block(scene, [.28, .28, .28], RESOURCE_META[type].color, [origin.x, .34, origin.z]);
+    mesh.position.x += (Math.random() - .5) * .7;
+    mesh.position.z += (Math.random() - .5) * .7;
+    state.drops.push({
+      type,
+      mesh,
+      velocity: new THREE.Vector3((Math.random() - .5) * 1.2, 1.6 + Math.random(), (Math.random() - .5) * 1.2),
+      age: 0,
+      picked: false
+    });
+  }
+}
+
+function spawnFragments(position, color) {
+  for (let i = 0; i < 22; i++) {
+    const mesh = block(scene, [.16, .16, .16], color, [position.x, 1.1, position.z]);
+    state.fragments.push({
+      mesh,
+      velocity: new THREE.Vector3((Math.random() - .5) * 3, 1.2 + Math.random() * 2.5, (Math.random() - .5) * 3),
+      life: .75 + Math.random() * .45
+    });
+  }
+}
+
+const player = makePlayer();
+seedWorld();
+
+function updateInventoryUi() {
+  const items = ["wood", "stone", "iron", "coin"];
+  inventoryGrid.innerHTML = items.map(type => {
+    const meta = RESOURCE_META[type];
+    return '<div class="slot"><div class="slot-icon" style="background:#' + meta.color.toString(16).padStart(6, "0") + '"></div><div>' + meta.label + '</div><div class="slot-count">' + state.inventory[type] + '</div></div>';
+  }).join("");
+}
+
+function updateHud() {
+  heartsEl.innerHTML = "";
+  for (let i = 0; i < state.maxHp; i++) {
+    const heart = document.createElement("div");
+    heart.className = "heart" + (i >= Math.ceil(state.hp) ? " empty" : "");
+    heartsEl.appendChild(heart);
+  }
+  playerHpBar.style.width = Math.max(0, state.hp / state.maxHp * 100) + "%";
+}
+
+function showToast(text) {
+  toast.textContent = text;
+  toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.remove("show"), 900);
+}
+
+function worldToScreen(position) {
+  tempVector.copy(position).project(camera);
+  return {
+    x: (tempVector.x * .5 + .5) * window.innerWidth,
+    y: (-tempVector.y * .5 + .5) * window.innerHeight
+  };
+}
+
+function flyToBag(type, worldPosition) {
+  const from = worldToScreen(worldPosition);
+  const bag = bagButton.getBoundingClientRect();
+  const el = document.createElement("div");
+  el.className = "fly-item";
+  el.style.left = from.x + "px";
+  el.style.top = from.y + "px";
+  el.style.background = "#" + RESOURCE_META[type].color.toString(16).padStart(6, "0");
+  document.body.appendChild(el);
+  requestAnimationFrame(() => {
+    el.style.transform = "translate(" + (bag.left + bag.width / 2 - from.x) + "px," + (bag.top + bag.height / 2 - from.y) + "px) scale(.35)";
+    el.style.opacity = "0";
+  });
+  setTimeout(() => el.remove(), 620);
+}
+
+function gather() {
+  if (state.gameOver || state.gatherCooldown > 0) return;
+  state.gatherCooldown = .35;
+  let target = null;
+  let best = 99;
+  for (const node of state.nodes) {
+    if (node.dead) continue;
+    const d = node.group.position.distanceTo(player.root.position);
+    if (d < best && d < node.radius + 1.6) {
+      best = d;
+      target = node;
+    }
+  }
+  if (!target) {
+    showToast("Get closer to a resource");
+    return;
+  }
+  target.hp -= 1;
+  target.group.rotation.z = (Math.random() - .5) * .15;
+  setTimeout(() => { target.group.rotation.z = 0; }, 130);
+  if (target.hp <= 0) {
+    target.dead = true;
+    spawnDrop(target.type, target.group.position, target.type === "wood" ? 3 : target.type === "iron" ? 2 : 3);
+    scene.remove(target.group);
+  } else {
+    spawnDrop(target.type, target.group.position, 1);
+  }
+}
+
+function attack() {
+  if (state.gameOver || state.attackCooldown > 0) return;
+  state.attackCooldown = .42;
+  let hit = false;
+  for (const enemy of state.enemies) {
+    if (enemy.dead) continue;
+    const d = enemy.group.position.distanceTo(player.root.position);
+    if (d < 1.85) {
+      enemy.hp -= 3;
+      enemy.group.position.add(enemy.group.position.clone().sub(player.root.position).normalize().multiplyScalar(.28));
+      hit = true;
+      if (enemy.hp <= 0) killEnemy(enemy);
+    }
+  }
+  if (!hit) showToast("No enemy in range");
+}
+
+function killEnemy(enemy) {
+  enemy.dead = true;
+  enemy.deathTimer = .55;
+  spawnDrop("coin", enemy.group.position, 2 + Math.floor(Math.random() * 3));
+  spawnFragments(enemy.group.position, enemy.type === "davide" ? 0x1f78d1 : 0x6f9b58);
+}
+
+function updatePlayer(dt, elapsed) {
+  const dir = new THREE.Vector3();
+  if (state.keys.has("KeyW") || state.keys.has("ArrowUp")) dir.z -= 1;
+  if (state.keys.has("KeyS") || state.keys.has("ArrowDown")) dir.z += 1;
+  if (state.keys.has("KeyA") || state.keys.has("ArrowLeft")) dir.x -= 1;
+  if (state.keys.has("KeyD") || state.keys.has("ArrowRight")) dir.x += 1;
+  if (dir.lengthSq() > 0) {
+    dir.normalize();
+    player.root.position.addScaledVector(dir, dt * 4.2);
+    player.root.position.x = THREE.MathUtils.clamp(player.root.position.x, -15.5, 15.5);
+    player.root.position.z = THREE.MathUtils.clamp(player.root.position.z, -15.5, 15.5);
+    player.root.rotation.y = Math.atan2(dir.x, dir.z);
+  }
+  const walk = Math.sin(elapsed * 8) * (dir.lengthSq() > 0 ? 1 : .2);
+  player.leftLeg.rotation.x = walk * .55;
+  player.rightLeg.rotation.x = -walk * .55;
+  player.leftArm.rotation.x = -walk * .45;
+  player.rightArm.rotation.x = walk * .45 - (state.attackCooldown > .22 ? 1.2 : 0);
+}
+
+function updateDrops(dt) {
+  for (const drop of state.drops) {
+    if (drop.picked) continue;
+    drop.age += dt;
+    drop.velocity.y -= dt * 4.4;
+    drop.mesh.position.addScaledVector(drop.velocity, dt);
+    if (drop.mesh.position.y < .28) {
+      drop.mesh.position.y = .28;
+      drop.velocity.y *= -.25;
+      drop.velocity.x *= .82;
+      drop.velocity.z *= .82;
+    }
+    drop.mesh.rotation.x += dt * 2.2;
+    drop.mesh.rotation.y += dt * 2.8;
+    if (drop.age > .35 && drop.mesh.position.distanceTo(player.root.position) < 1.55) {
+      drop.picked = true;
+      state.inventory[drop.type] += 1;
+      flyToBag(drop.type, drop.mesh.position.clone());
+      scene.remove(drop.mesh);
+      updateInventoryUi();
+    }
+  }
+  state.drops = state.drops.filter(drop => !drop.picked);
+}
+
+function updateEnemies(dt, elapsed) {
+  for (const enemy of state.enemies) {
+    if (enemy.dead) {
+      enemy.deathTimer -= dt;
+      enemy.group.visible = Math.floor(enemy.deathTimer * 20) % 2 === 0;
+      if (enemy.deathTimer <= 0) {
+        scene.remove(enemy.group);
+        enemy.label.remove();
+      }
+      continue;
+    }
+
+    const distanceFromSpawn = enemy.group.position.distanceTo(enemy.spawn);
+    const distanceToPlayer = enemy.group.position.distanceTo(player.root.position);
+    enemy.active = distanceToPlayer < 5.5 || (enemy.active && distanceFromSpawn < 8);
+
+    if (enemy.active) {
+      const dir = player.root.position.clone().sub(enemy.group.position);
+      dir.y = 0;
+      if (dir.lengthSq() > .01) {
+        dir.normalize();
+        enemy.group.position.addScaledVector(dir, dt * enemy.speed);
+        enemy.group.rotation.y = Math.atan2(dir.x, dir.z);
+      }
+      if (distanceToPlayer < 1.25 && enemy.attackCooldown <= 0 && state.playerHitCooldown <= 0) {
+        state.hp -= enemy.atk;
+        enemy.attackCooldown = 1.1;
+        state.playerHitCooldown = .55;
+        updateHud();
+        if (state.hp <= 0) endGame();
+      }
+    } else if (distanceFromSpawn > .2) {
+      const home = enemy.spawn.clone().sub(enemy.group.position);
+      home.y = 0;
+      enemy.group.position.addScaledVector(home.normalize(), dt * .8);
+    }
+
+    enemy.attackCooldown -= dt;
+    const swing = Math.sin(elapsed * 5 + enemy.spawn.x) * .45;
+    enemy.parts.leftLeg.rotation.x = swing;
+    enemy.parts.rightLeg.rotation.x = -swing;
+    enemy.parts.leftArm.rotation.x = -swing;
+    enemy.parts.rightArm.rotation.x = swing;
+  }
+}
+
+function updateEnemyLabels() {
+  for (const enemy of state.enemies) {
+    if (enemy.dead || enemy.hp <= 0) {
+      enemy.label.style.display = "none";
+      continue;
+    }
+    const screen = worldToScreen(enemy.group.position.clone().add(new THREE.Vector3(0, 2.55, 0)));
+    enemy.label.style.left = screen.x + "px";
+    enemy.label.style.top = screen.y + "px";
+    enemy.label.querySelector(".enemy-fill").style.width = Math.max(0, enemy.hp / enemy.maxHp * 100) + "%";
+    enemy.label.style.display = enemy.active ? "block" : "none";
+  }
+}
+
+function updateFragments(dt) {
+  for (const frag of state.fragments) {
+    frag.life -= dt;
+    frag.velocity.y -= dt * 5.6;
+    frag.mesh.position.addScaledVector(frag.velocity, dt);
+    frag.mesh.rotation.x += dt * 5;
+    frag.mesh.rotation.y += dt * 4;
+    if (frag.mesh.position.y < .08) {
+      frag.mesh.position.y = .08;
+      frag.velocity.y *= -.18;
+    }
+    if (frag.life <= 0) scene.remove(frag.mesh);
+  }
+  state.fragments = state.fragments.filter(frag => frag.life > 0);
+}
+
+function updateCamera() {
+  const target = player.root.position.clone();
+  const desired = target.clone().add(new THREE.Vector3(0, 9, 9));
+  camera.position.lerp(desired, .08);
+  camera.lookAt(target.x, 1.05, target.z);
+}
+
+function endGame() {
+  state.gameOver = true;
+  gameOverEl.classList.add("open");
+}
+
+function resize() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+
+window.addEventListener("resize", resize);
+window.addEventListener("keydown", event => {
+  state.keys.add(event.code);
+  if (event.code === "KeyE") gather();
+  if (event.code === "Space") {
+    event.preventDefault();
+    attack();
+  }
+});
+window.addEventListener("keyup", event => state.keys.delete(event.code));
+
+gatherButton.addEventListener("click", gather);
+attackButton.addEventListener("click", attack);
+bagButton.addEventListener("click", () => {
+  updateInventoryUi();
+  inventoryModal.classList.add("open");
+});
+closeInventory.addEventListener("click", () => inventoryModal.classList.remove("open"));
+inventoryModal.addEventListener("click", event => {
+  if (event.target === inventoryModal) inventoryModal.classList.remove("open");
+});
+playAgain.addEventListener("click", () => window.location.reload());
+
+function tick() {
+  const dt = Math.min(clock.getDelta(), .04);
+  const elapsed = clock.elapsedTime;
+  if (!state.gameOver) {
+    state.attackCooldown = Math.max(0, state.attackCooldown - dt);
+    state.gatherCooldown = Math.max(0, state.gatherCooldown - dt);
+    state.playerHitCooldown = Math.max(0, state.playerHitCooldown - dt);
+    updatePlayer(dt, elapsed);
+    updateDrops(dt);
+    updateEnemies(dt, elapsed);
+    updateFragments(dt);
+    updateCamera();
+    updateEnemyLabels();
+  }
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+
+resize();
+updateHud();
+updateInventoryUi();
+tick();
+</script>
+
+<script nomodule>
+document.getElementById("noWebgl").style.display = "grid";
+</script>
+</body>
+</html>
