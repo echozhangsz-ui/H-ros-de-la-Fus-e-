@@ -1548,23 +1548,28 @@ function animateModel(model, elapsed) {
   const { config, parts, root } = model;
   if (config.spiderBoss) {
     const crawl = Math.sin(elapsed * 3.2);
-    const counter = Math.cos(elapsed * 3.2);
+    const shootWave = Math.sin(elapsed * 1.55);
+    const shootRaise = Math.max(0, shootWave);
+    const shootEase = shootRaise * shootRaise * (3 - 2 * shootRaise);
     root.position.y = .02 + Math.abs(crawl) * .035;
     parts.body.rotation.z = crawl * .018;
     parts.head.rotation.z = -crawl * .024;
     parts.spiderLegs.forEach((leg, i) => {
-      const phase = Math.sin(elapsed * 4.2 + i * .85);
-      const lift = i % 3 === 0 ? .42 : .24;
-      leg.pivot.rotation.z = leg.basePivotZ + phase * .14;
-      leg.pivot.rotation.x = leg.basePivotX + phase * .06;
-      leg.upper.rotation.z = leg.baseUpperZ + phase * .07 * (leg.side === "left" ? 1 : -1);
-      leg.lower.rotation.z = leg.baseLowerZ + phase * lift * (leg.side === "left" ? -1 : 1);
-      leg.foot.rotation.z = leg.baseFootZ + phase * .12;
+      const sideOffset = leg.side === "left" ? 0 : Math.PI;
+      const rowOffset = leg.index * 1.05;
+      const phase = Math.sin(elapsed * 3.6 + rowOffset + sideOffset);
+      const rearDamping = leg.index === 2 ? .62 : 1;
+      const lift = leg.index === 0 ? .34 : leg.index === 1 ? .25 : .18;
+      leg.pivot.rotation.z = leg.basePivotZ + phase * .1 * rearDamping;
+      leg.pivot.rotation.x = leg.basePivotX + phase * .045 * rearDamping;
+      leg.upper.rotation.z = leg.baseUpperZ + phase * .055 * rearDamping * (leg.side === "left" ? 1 : -1);
+      leg.lower.rotation.z = leg.baseLowerZ + phase * lift * rearDamping * (leg.side === "left" ? -1 : 1);
+      leg.foot.rotation.z = leg.baseFootZ + phase * .08 * rearDamping;
     });
-    if (counter > .72) {
-      parts.spiderLegs[0].pivot.rotation.z -= .35;
-      parts.spiderLegs[1].pivot.rotation.z += .35;
-    }
+    parts.spiderLegs[0].pivot.rotation.z -= shootEase * .28;
+    parts.spiderLegs[1].pivot.rotation.z += shootEase * .28;
+    parts.spiderLegs[0].lower.rotation.z += shootEase * .12;
+    parts.spiderLegs[1].lower.rotation.z -= shootEase * .12;
     return;
   }
   const speed = config.boss ? 2.6 : config.zombie ? 3.1 : config.id === "davide" ? 4.8 : 4.1;
