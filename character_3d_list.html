@@ -960,6 +960,30 @@ h1 {
   font-size: 20px;
 }
 
+.animation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.animation-button {
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.animation-button.active {
+  background: var(--ink);
+  color: #fff;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -1108,6 +1132,7 @@ h1 {
       '</div>' +
       '<div class="meta"><h2>' + config.name + '</h2><p class="role">' + config.role + '</p><p class="desc">' + config.desc + '</p>' +
       '<div class="stats"><div class="stat"><strong>' + config.pv + '</strong>PV</div><div class="stat"><strong>' + config.atk + '</strong>Attack</div><div class="stat"><strong>' + config.speed + '</strong>Speed</div></div>' +
+      '<div class="animation-controls" aria-label="' + config.name + ' animations"><button class="animation-button active" type="button" data-animation="walk">Walk</button><button class="animation-button" type="button" data-animation="attack">Attack</button></div>' +
       '<div class="tags">' + config.tags.map(function (tag) { return '<span class="pill">' + tag + '</span>'; }).join("") + '</div></div></article>';
   }
 
@@ -1541,11 +1566,12 @@ function attackPulse(elapsed, offset = 0, period = 3.15, width = .34) {
   return wave * wave;
 }
 
-function animateModel(model, elapsed) {
+function animateModel(model, elapsed, mode = "walk", modeElapsed = elapsed) {
   const { config, parts, root } = model;
+  const attacking = mode === "attack";
   if (config.spiderBoss) {
     const crawl = Math.sin(elapsed * 4.1);
-    const shootEase = attackPulse(elapsed, .18, 3.1, .42);
+    const shootEase = attacking ? attackPulse(modeElapsed, 0, 1.45, .82) : 0;
     root.position.y = .02 + Math.abs(crawl) * .055;
     root.position.z = -shootEase * .14;
     parts.body.rotation.z = crawl * .032;
@@ -1596,7 +1622,7 @@ function animateModel(model, elapsed) {
   if (parts.extraLeft) parts.extraLeft.rotation.x = counter * .46;
   if (parts.extraRight) parts.extraRight.rotation.x = -counter * .46;
 
-  const attack = attackPulse(elapsed, config.id === "davide" ? .45 : config.id === "julie" ? .25 : config.id === "zombie" ? .62 : 0);
+  const attack = attacking ? attackPulse(modeElapsed, 0, 1.35, .82) : 0;
   if (config.id === "marc") {
     root.position.z = -attack * .06;
     parts.body.rotation.z += attack * .08;
@@ -1695,8 +1721,19 @@ characters.forEach(config => {
   const canvas = card.querySelector("canvas");
   try {
     const entry = createScene(canvas, config);
+    entry.mode = "walk";
+    entry.modeStartedAt = 0;
     viewer.classList.add("webgl-ready");
     attachDrag(viewer, entry);
+    card.querySelectorAll(".animation-button").forEach(button => {
+      button.addEventListener("click", () => {
+        entry.mode = button.dataset.animation || "walk";
+        entry.modeStartedAt = clock.getElapsedTime();
+        card.querySelectorAll(".animation-button").forEach(item => {
+          item.classList.toggle("active", item === button);
+        });
+      });
+    });
     liveCards.push({ viewer, entry });
   } catch (error) {
     console.error(error);
@@ -1712,7 +1749,7 @@ function render() {
     entry.rotation += (entry.targetRotation - entry.rotation) * .18;
     if (!entry.dragging) entry.targetRotation += .0023;
     entry.model.root.rotation.y = entry.rotation;
-    animateModel(entry.model, elapsed);
+    animateModel(entry.model, elapsed, entry.mode, elapsed - entry.modeStartedAt);
     entry.renderer.render(entry.scene, entry.camera);
   }
   requestAnimationFrame(render);
