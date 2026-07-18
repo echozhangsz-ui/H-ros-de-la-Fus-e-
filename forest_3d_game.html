@@ -393,6 +393,8 @@ const RESOURCE_META = {
 const MAP_SIZE = 160;
 const MAP_LIMIT = MAP_SIZE / 2 - 2;
 const CAMERA_DISTANCE = 20;
+const CAMERA_MIN_PITCH = .08;
+const CAMERA_MAX_PITCH = 1.28;
 const TOOL_FOR_NODE = { wood: "axe", stone: "hammer", iron: "pickaxe" };
 const TOOL_LABELS = { sword: "Sword", axe: "Axe", hammer: "Hammer", pickaxe: "Pickaxe" };
 const NODE_TOOL_NAMES = { wood: "Axe", stone: "Hammer", iron: "Pickaxe" };
@@ -409,7 +411,7 @@ const state = {
   keys: new Set(),
   moveTarget: null,
   cameraYaw: Math.PI / 4,
-  cameraPitch: .82,
+  cameraPitch: .78,
   cameraDistance: CAMERA_DISTANCE,
   pointerDown: false,
   pointerMoved: false,
@@ -988,7 +990,7 @@ renderer.domElement.addEventListener("pointermove", event => {
   }
   if (state.pointerMoved) {
     state.cameraYaw -= dx * .006;
-    state.cameraPitch = THREE.MathUtils.clamp(state.cameraPitch + dy * .004, .42, 1.2);
+    state.cameraPitch = THREE.MathUtils.clamp(state.cameraPitch + dy * .004, CAMERA_MIN_PITCH, CAMERA_MAX_PITCH);
   }
 });
 
